@@ -1,5 +1,5 @@
 defaults:
-  - transforms: calvin_transforms
+  - transforms: calvin_transforms_color_aug
 
 _target_: flower.datasets.hulc_data_module.HulcDataModule
 _recursive_: false
@@ -19,8 +19,8 @@ observation_space:
   language: ['language']
 
 proprioception_dims:
-  n_state_obs: 13
-  keep_indices: [[0, 13]]
+  n_state_obs: 11
+  keep_indices: [[2, 13]]
   normalize: false
   normalize_robot_orientation: false
 
@@ -43,3 +43,6 @@ datasets:
     obs_seq_len: ${obs_seq_len}
     future_range: 1
     use_extracted_rel_actions: ${use_extracted_rel_actions}
+    load_bbox: ${model.bbox_loss}
+    bbox_key: ${model.bbox_key}
+    bbox_rgb_key: rgb_static

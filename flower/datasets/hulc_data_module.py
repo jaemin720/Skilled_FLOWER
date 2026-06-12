@@ -5,7 +5,7 @@ from typing import Dict, List
 
 import hydra
 import numpy as np
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig, ListConfig, OmegaConf
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 import torchvision
@@ -16,6 +16,12 @@ from flower.datasets.utils.episode_utils import load_dataset_statistics
 logger = logging.getLogger(__name__)
 DEFAULT_TRANSFORM = OmegaConf.create({"train": None, "val": None})
 ONE_EP_DATASET_URL = "http://www.informatik.uni-freiburg.de/~meeso/50steps.tar.xz"
+
+
+def _to_torchvision_arg(value):
+    if isinstance(value, (list, tuple, ListConfig)):
+        return tuple(value)
+    return value
 
 
 class HulcDataModule(pl.LightningDataModule):
@@ -86,9 +92,9 @@ class HulcDataModule(pl.LightningDataModule):
                 # print("Instantiating transform for camera", cam, ":", transform)
                 if transform._target_ == "torchvision.transforms.ColorJitter":
                     instantiated_transform = torchvision.transforms.ColorJitter(
-                        brightness=transform.brightness,
-                        contrast=tuple(transform.contrast),
-                        saturation=tuple(transform.saturation),
+                        brightness=_to_torchvision_arg(transform.brightness),
+                        contrast=_to_torchvision_arg(transform.contrast),
+                        saturation=_to_torchvision_arg(transform.saturation),
                     )
                 else:
                     print("Instantiating transform for camera", cam, ":", transform)

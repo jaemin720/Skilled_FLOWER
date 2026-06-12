@@ -18,4 +18,4 @@ checkpoint:
   mode: min
   dirpath: saved_models
   filename: '{epoch:02d}_{train/action_loss:.4f}'
-  every_n_epochs: 1
+  every_n_epochs: 10

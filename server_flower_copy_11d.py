@@ -3,6 +3,7 @@ import importlib
 import json
 import logging
 import pickle
+import time
 from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -17,7 +18,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
 from omegaconf import OmegaConf
 
-from flower.datasets.utils.episode_utils import (
+from flower_bed.Skill_flower.FLOWER_Calvin_Custom.flower.datasets.utils.episode_utils import (
     load_dataset_statistics,
     process_rgb,
     process_state,
@@ -87,30 +88,6 @@ def load_run_config(run_dir: Path):
     return OmegaConf.load(config_path)
 
 
-def infer_kept_proprio_dim(proprio_state) -> Optional[int]:
-    if proprio_state is None or "keep_indices" not in proprio_state:
-        return None
-
-    kept_dim = 0
-    for slice_ids in proprio_state.keep_indices:
-        start, end = map(int, slice_ids)
-        if end < start:
-            raise ValueError(f"Invalid keep_indices slice: {slice_ids}")
-        kept_dim += end - start
-    return kept_dim
-
-
-def infer_required_proprio_dim(proprio_state) -> Optional[int]:
-    if proprio_state is None or "keep_indices" not in proprio_state:
-        return None
-
-    required_dim = 0
-    for slice_ids in proprio_state.keep_indices:
-        _, end = map(int, slice_ids)
-        required_dim = max(required_dim, end)
-    return required_dim
-
-
 def build_val_transforms(cfg, dataset_root: Optional[Path]) -> Dict[str, torchvision.transforms.Compose]:
     transforms_cfg = cfg.datamodule.transforms
     if dataset_root is not None:
@@ -133,8 +110,29 @@ def build_val_transforms(cfg, dataset_root: Optional[Path]) -> Dict[str, torchvi
     return val_transforms
 
 
+def infer_kept_proprio_dim(proprio_state) -> Optional[int]:
+    if proprio_state is None or "keep_indices" not in proprio_state:
+        return None
+
+    dim = 0
+    for slice_ids in proprio_state.keep_indices:
+        start, end = int(slice_ids[0]), int(slice_ids[1])
+        dim += end - start
+    return dim
+
+
+def infer_required_proprio_dim(proprio_state) -> Optional[int]:
+    if proprio_state is None or "keep_indices" not in proprio_state:
+        return None
+
+    required = 0
+    for slice_ids in proprio_state.keep_indices:
+        required = max(required, int(slice_ids[1]))
+    return required
+
+
 def apply_ema_weights(model: torch.nn.Module, checkpoint_path: Path) -> None:
-    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    checkpoint = torch.load(checkpoint_path, map_location="cpu",weights_only=False)
     ema_weights = checkpoint.get("callbacks", {}).get("EMA", {}).get("ema_weights")
     if ema_weights is None:
         LOGGER.info("No EMA weights found in %s; using checkpoint state_dict.", checkpoint_path)
@@ -182,11 +180,22 @@ def load_model(
     model_cfg["second_view_key"] = "rgb_gripper"
 
     model_class = load_class(class_name)
-    model = model_class.load_from_checkpoint(
-        str(checkpoint_path),
-        map_location=device,
-        **model_cfg,
-    )
+
+    _orig_torch_load = torch.load
+
+    def _torch_load_weights_only_false(*args, **kwargs):
+        kwargs.setdefault("weights_only", False)
+        return _orig_torch_load(*args, **kwargs)
+
+    torch.load = _torch_load_weights_only_false
+    try:
+        model = model_class.load_from_checkpoint(
+            str(checkpoint_path),
+            map_location=device,
+            **model_cfg,
+        )
+    finally:
+        torch.load = _orig_torch_load
 
     if use_ema_weights:
         apply_ema_weights(model, checkpoint_path)
@@ -242,7 +251,6 @@ class FlowerInferenceServer:
         if self.use_proprio:
             LOGGER.info("Accepted proprio dims: %s", sorted(self.accepted_proprio_dims))
 
-
         if args.data_name:
             LOGGER.warning("--data_name is ignored by this server.")
         if args.stats_path:
@@ -267,9 +275,8 @@ class FlowerInferenceServer:
         if self.accepted_proprio_dims and incoming_dim not in self.accepted_proprio_dims:
             raise ValueError(
                 f"Received proprio dim {incoming_dim}, but checkpoint expects one of "
-                f"{sorted(self.accepted_proprio_dims)}. "
-                "If you are sending force/torque only, extract it on the client and send 6D "
-                "proprio, or send the full robot_obs that matches the checkpoint keep_indices."
+                f"{sorted(self.accepted_proprio_dims)}. For 11D x/y-removed proprio, use a "
+                "checkpoint trained with keep_indices [[2, 13]], or send the full 13D proprio."
             )
 
         if incoming_dim == self.expected_proprio_dim:
@@ -331,8 +338,13 @@ class FlowerInferenceServer:
         if self.prompt_text is None:
             raise RuntimeError("Prompt is not set. Call /reset first.")
 
+        t0 = time.perf_counter()
         obs_payload = payload["observation"] if "observation" in payload else payload
         obs = self._build_observation(obs_payload)
+        if self.device.type == "cuda":
+            torch.cuda.synchronize()
+        t1 = time.perf_counter()
+
         goal = {"lang_text": self.prompt_text}
 
         autocast_context = (
@@ -344,7 +356,21 @@ class FlowerInferenceServer:
             with autocast_context:
                 action = self.model.step(obs, goal)
 
+        if self.device.type == "cuda":
+            torch.cuda.synchronize()
+        t2 = time.perf_counter()
+
         action_np = action.detach().cpu().numpy().astype(np.float32)
+        t3 = time.perf_counter()
+
+        LOGGER.info(
+            "[SERVER timing] build_obs=%.2f ms, model_step=%.2f ms, "
+            "to_numpy=%.2f ms, total=%.2f ms",
+            (t1 - t0) * 1000,
+            (t2 - t1) * 1000,
+            (t3 - t2) * 1000,
+            (t3 - t0) * 1000,
+        )
         return np.squeeze(action_np)
 
 
@@ -358,8 +384,6 @@ def build_app(server: FlowerInferenceServer) -> FastAPI:
             "checkpoint": str(server.checkpoint_path),
             "run_dir": str(server.run_dir),
             "device": str(server.device),
-            "use_proprio": server.use_proprio,
-            "accepted_proprio_dims": sorted(server.accepted_proprio_dims),
         }
 
     @app.post("/reset")

@@ -13,6 +13,30 @@ Expected input layout:
           *.pkl
       ...
 
+Optional separate validation input layout:
+
+    VAL_INPUT_ROOT/
+      multi_usb/
+        2026-04-20/
+          *.pkl
+      multi_val_usb_p1/
+        2026-05-18/
+          *.pkl
+      multi_val_usb_p2/
+        2026-05-15/
+          *.pkl
+      multi_val_usb_unseen/
+        *.pkl
+      ...
+
+Validation folder names such as multi_val_usb_p1, multi_val_usb_p2, and
+multi_val_usb_unseen are automatically mapped to the canonical task name
+multi_usb for language annotations and per-task summaries.
+
+When --val_input / --validation_input is provided, --input is written to
+training/ and --val_input is written to validation/. In that mode --val_ratio
+is ignored.
+
 The generated dataset layout is:
 
     OUTPUT_ROOT/
@@ -36,6 +60,7 @@ FLOWER disk loader:
     - robot_obs
     - rel_actions
     - scene_obs
+    - right_force_history (optional; [T, 6] force/torque history)
 """
 
 from __future__ import annotations
@@ -47,13 +72,19 @@ from dataclasses import dataclass
 from pathlib import Path
 import pickle
 import random
-from typing import Any, Dict, List, Sequence, Tuple
+import re
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 from tqdm import tqdm
 
 
 LOGGER = logging.getLogger("convert_multitask_raw_pkl_to_flower")
+
+# [MOD] Action relabeling is disabled.
+# Preserve every raw action value exactly as it appears in the pickle files.
+# The previous gripper relabeling constants/helpers were removed because they
+# overwrote the raw gripper command from the observed gripper state.
 
 
 TASK_PROMPTS = {
@@ -70,12 +101,49 @@ TASK_PROMPTS = {
 }
 
 
+def canonicalize_task_folder_name(folder_name: str, task_prompts: Optional[Dict[str, str]] = None) -> str:
+    """Map validation-condition folder names to canonical FLOWER task names.
+
+    Examples:
+        multi_val_usb_p1 -> multi_usb
+        multi_val_usb_p2 -> multi_usb
+        multi_val_usb_unseen -> multi_usb
+        multi_val_bar_latch_p1 -> multi_bar_latch
+        multi_usb -> multi_usb
+
+    The function is conservative: if a folder cannot be mapped to a known task,
+    the original folder name is returned so existing behavior is preserved.
+    """
+    known_tasks = task_prompts or TASK_PROMPTS
+    if folder_name in known_tasks:
+        return folder_name
+
+    # Remove validation split prefix used by the provided directory layout.
+    candidate = folder_name
+    if candidate.startswith("multi_val_"):
+        candidate = "multi_" + candidate[len("multi_val_"):]
+
+    # Remove condition suffixes such as _p1, _p2, ... and _unseen.
+    candidate = re.sub(r"_(?:p\d+|unseen)$", "", candidate)
+    if candidate in known_tasks:
+        return candidate
+
+    # Fallback: find the longest known task that prefixes the candidate.
+    # This handles names such as multi_usb_p1 even without the multi_val_ prefix.
+    for task_name in sorted(known_tasks.keys(), key=len, reverse=True):
+        if candidate == task_name or candidate.startswith(task_name + "_"):
+            return task_name
+
+    return folder_name
+
+
 @dataclass
 class EpisodeRecord:
     steps: List[Dict[str, Any]]
     source_name: str
     source_episode_index: int
     task_name: str
+    raw_task_folder: str
 
 
 def parse_args() -> argparse.Namespace:
@@ -85,6 +153,17 @@ def parse_args() -> argparse.Namespace:
         required=True,
         type=Path,
         help="Root directory containing task folders with pickle files.",
+    )
+    parser.add_argument(
+        "--val_input",
+        "--validation_input",
+        dest="val_input",
+        type=Path,
+        default=None,
+        help=(
+            "Optional root directory containing validation task folders. "
+            "If provided, --input is used only for training and --val_ratio is ignored."
+        ),
     )
     parser.add_argument(
         "--output_root",
@@ -120,6 +199,12 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=11,
         help="Episodes shorter than this are skipped.",
+    )
+    parser.add_argument(
+        "--zero_action_trailing_keep",
+        type=int,
+        default=5,
+        help="Number of trailing steps to keep after the final non-zero action when trimming zero-action padding.",
     )
     parser.add_argument(
         "--task_name",
@@ -212,6 +297,19 @@ def parse_args() -> argparse.Namespace:
         help="Slice selecting right-arm tcp torque from the state vector.",
     )
     parser.add_argument(
+        "--include_right_force_history",
+        action="store_true",
+        help=(
+            "Store observations[right_force_history] into each timestep npz as "
+            "'right_force_history'. Expected raw shape is [1,T,6] or [T,6]."
+        ),
+    )
+    parser.add_argument(
+        "--right_force_history_key",
+        default="right_force_history",
+        help="Observation key containing right-arm force/torque history.",
+    )
+    parser.add_argument(
         "--scene_obs_dim",
         type=int,
         default=1,
@@ -248,6 +346,38 @@ def squeeze_leading_singletons(array: np.ndarray) -> np.ndarray:
     while array.ndim > 0 and array.shape[0] == 1:
         array = array[0]
     return array
+
+
+# [MOD] Gripper/action relabeling helpers were intentionally removed.
+# From this point onward, conversion may trim zero-action padding, but it must
+# not rewrite step["actions"] based on robot state.
+
+
+def trim_zero_action_episode_steps(
+    episode: Sequence[Dict[str, Any]],
+    trailing_keep: int = 5,
+) -> Optional[List[Dict[str, Any]]]:
+    if not episode:
+        return None
+
+    actions = [to_numpy(step.get("actions")) for step in episode]
+    total_steps = len(actions)
+
+    start_idx = 0
+    while start_idx < total_steps and np.all(actions[start_idx] == 0):
+        start_idx += 1
+
+    if start_idx == total_steps:
+        return None
+
+    end_idx = total_steps - 1
+    while end_idx >= 0 and np.all(actions[end_idx] == 0):
+        end_idx -= 1
+
+    # [MOD] Keep only zero-action padding trimming.
+    # Action relabeling is disabled, so returned steps keep their original action values.
+    trim_end = min(total_steps, end_idx + 1 + trailing_keep)
+    return list(episode[start_idx:trim_end])
 
 
 def normalize_image(image_like: Any) -> np.ndarray:
@@ -393,6 +523,9 @@ def load_episode_records(
     input_path: Path,
     pkl_glob: str,
     task_names: Sequence[str] | None,
+    state_key: str,
+    zero_action_trailing_keep: int,
+    task_prompts: Optional[Dict[str, str]] = None,
 ) -> List[EpisodeRecord]:
     if input_path.is_file():
         raise ValueError("Multi-task conversion expects --input to be a root directory containing task folders.")
@@ -400,21 +533,40 @@ def load_episode_records(
     if not input_path.is_dir():
         raise FileNotFoundError(f"Input path does not exist: {input_path}")
 
+    all_task_dirs = sorted([path for path in input_path.iterdir() if path.is_dir()])
     if task_names is None:
-        task_dirs = sorted([path for path in input_path.iterdir() if path.is_dir()])
+        task_dirs = all_task_dirs
     else:
-        task_dirs = [input_path / task_name for task_name in task_names]
+        requested = set(task_names)
+        task_dirs = [
+            path
+            for path in all_task_dirs
+            if path.name in requested
+            or canonicalize_task_folder_name(path.name, task_prompts) in requested
+        ]
+        missing = sorted(requested - {path.name for path in task_dirs} - {canonicalize_task_folder_name(path.name, task_prompts) for path in task_dirs})
+        if missing:
+            raise FileNotFoundError(
+                f"Task folders not found in {input_path}: {missing}. "
+                "For validation layouts like multi_val_usb_p1, you may request the canonical task name, e.g. multi_usb."
+            )
 
     if not task_dirs:
         raise FileNotFoundError(f"No task folders found in {input_path}")
 
     records: List[EpisodeRecord] = []
 
+    # [MOD] state_key is kept in the function signature for call-site compatibility,
+    # but action relabeling from state is disabled and this function no longer mutates actions.
+
     for task_dir in task_dirs:
         if not task_dir.is_dir():
             raise FileNotFoundError(f"Task folder not found: {task_dir}")
 
-        task_name = task_dir.name
+        raw_task_folder = task_dir.name
+        task_name = canonicalize_task_folder_name(raw_task_folder, task_prompts)
+        if task_name != raw_task_folder:
+            LOGGER.info("Mapped task folder '%s' -> canonical task '%s'.", raw_task_folder, task_name)
         pkl_files = sorted(task_dir.glob(pkl_glob))
         if not pkl_files:
             LOGGER.warning("No pickle files matched %s in %s", pkl_glob, task_dir)
@@ -427,29 +579,65 @@ def load_episode_records(
             for path in pkl_files[1:]:
                 step_stream.append(load_pickle(path))
             episodes = group_step_transitions(step_stream)
+            trimmed_episodes: List[List[Dict[str, Any]]] = []
+            dropped_episode_count = 0
+            trimmed_step_count = 0
+
+            for steps in episodes:
+                # [MOD] Trim zero-action padding only. Do not relabel or overwrite action values.
+                trimmed_steps = trim_zero_action_episode_steps(steps, trailing_keep=zero_action_trailing_keep)
+                if trimmed_steps is None:
+                    dropped_episode_count += 1
+                    continue
+                trimmed_step_count += len(steps) - len(trimmed_steps)
+                trimmed_episodes.append(trimmed_steps)
+
+            episodes = trimmed_episodes
+            LOGGER.info(
+                "Trimmed %d zero-action steps and dropped %d all-zero episodes for task %s. Action relabeling disabled.",
+                trimmed_step_count,
+                dropped_episode_count,
+                task_name,
+            )
             records.extend(
                 EpisodeRecord(
                     steps=steps,
-                    source_name=f"{task_name}::step_stream",
+                    source_name=f"{raw_task_folder}::step_stream",
                     source_episode_index=idx,
                     task_name=task_name,
+                    raw_task_folder=raw_task_folder,
                 )
                 for idx, steps in enumerate(episodes)
             )
             continue
 
+        task_trimmed_step_count = 0
+        task_dropped_episode_count = 0
         for path in tqdm(pkl_files, desc=f"Loading {task_name} pickle files"):
             payload = load_pickle(path)
             episodes = extract_episodes_from_object(payload)
             for idx, steps in enumerate(episodes):
+                # [MOD] Trim zero-action padding only. Do not relabel or overwrite action values.
+                trimmed_steps = trim_zero_action_episode_steps(steps, trailing_keep=zero_action_trailing_keep)
+                if trimmed_steps is None:
+                    task_dropped_episode_count += 1
+                    continue
+                task_trimmed_step_count += len(steps) - len(trimmed_steps)
                 records.append(
                     EpisodeRecord(
-                        steps=steps,
+                        steps=trimmed_steps,
                         source_name=path.stem,
                         source_episode_index=idx,
                         task_name=task_name,
+                        raw_task_folder=raw_task_folder,
                     )
                 )
+        LOGGER.info(
+            "Trimmed %d zero-action steps and dropped %d all-zero episodes for task %s. Action relabeling disabled.",
+            task_trimmed_step_count,
+            task_dropped_episode_count,
+            task_name,
+        )
 
     return records
 
@@ -523,6 +711,37 @@ def build_rel_action(
     if rel_action.shape != (7,):
         raise ValueError(f"Expected rel_action with shape (7,), got {rel_action.shape}")
     return rel_action
+
+
+def build_right_force_history(step: Dict[str, Any], history_key: str) -> np.ndarray:
+    """Extract per-timestep right force/torque history as [T, 6].
+
+    The raw robot pickle stores 100 Hz F/T history under observations with a
+    leading singleton batch dimension, typically [1, 10, 6]. The FLOWER disk
+    dataset should save one timestep's history as [T, 6]; ExtendedDiskDataset
+    later stacks obs frames into [obs_seq_len, T, 6].
+    """
+    observations = step["observations"]
+    resolved_key = resolve_obs_key(
+        observations,
+        history_key,
+        ("right_force_history", "right_ft_history", "force_history"),
+    )
+    history = squeeze_leading_singletons(to_numpy(observations[resolved_key], dtype=np.float32))
+
+    if history.ndim == 1:
+        if history.size % 6 != 0:
+            raise ValueError(
+                f"{resolved_key} flat history length must be divisible by 6, got {history.shape}"
+            )
+        history = history.reshape(-1, 6)
+
+    if history.ndim != 2 or history.shape[-1] != 6:
+        raise ValueError(
+            f"{resolved_key} should have shape [T,6] after squeeze, got {history.shape}"
+        )
+
+    return history.astype(np.float32)
 
 
 def load_instruction_mapping(path: Path | None) -> Any:
@@ -602,6 +821,8 @@ def save_timestep_npz(
     include_right_ft: bool,
     force_slice: slice,
     torque_slice: slice,
+    include_right_force_history: bool,
+    right_force_history_key: str,
     action_source: str,
     action_slice: slice,
     prefer_intervene_action: bool,
@@ -640,14 +861,17 @@ def save_timestep_npz(
     )
     scene_obs = np.zeros((scene_obs_dim,), dtype=np.float32)
 
-    np.savez_compressed(
-        destination,
-        rgb_static=rgb_static,
-        rgb_gripper=rgb_gripper,
-        robot_obs=robot_obs.astype(np.float32),
-        rel_actions=rel_actions.astype(np.float32),
-        scene_obs=scene_obs,
-    )
+    payload = {
+        "rgb_static": rgb_static,
+        "rgb_gripper": rgb_gripper,
+        "robot_obs": robot_obs.astype(np.float32),
+        "rel_actions": rel_actions.astype(np.float32),
+        "scene_obs": scene_obs,
+    }
+    if include_right_force_history:
+        payload["right_force_history"] = build_right_force_history(step, right_force_history_key)
+
+    np.savez_compressed(destination, **payload)
 
 
 def write_split(
@@ -668,6 +892,8 @@ def write_split(
     include_right_ft: bool,
     force_slice: slice,
     torque_slice: slice,
+    include_right_force_history: bool,
+    right_force_history_key: str,
     action_source: str,
     action_slice: slice,
     prefer_intervene_action: bool,
@@ -720,6 +946,8 @@ def write_split(
                 include_right_ft=include_right_ft,
                 force_slice=force_slice,
                 torque_slice=torque_slice,
+                include_right_force_history=include_right_force_history,
+                right_force_history_key=right_force_history_key,
                 action_source=action_source,
                 action_slice=action_slice,
                 prefer_intervene_action=prefer_intervene_action,
@@ -739,7 +967,7 @@ def write_split(
                 "source_name": record.source_name,
                 "source_episode_index": record.source_episode_index,
                 "task_name": task_name,
-                "raw_task_folder": record.task_name,
+                "raw_task_folder": record.raw_task_folder,
                 "num_steps": len(record.steps),
                 "instruction": instruction,
                 "start_step_index": start,
@@ -771,12 +999,48 @@ def write_split(
         "saved_step_count": global_step_index,
         "lang_folder": lang_folder,
         "robot_obs_dim": 13 if include_right_ft else 7,
+        "include_right_force_history": include_right_force_history,
+        "right_force_history_key": right_force_history_key if include_right_force_history else None,
         "per_task_episode_count": per_task_episode_count,
         "metadata": metadata,
     }
     with (split_dir / "conversion_metadata.json").open("w", encoding="utf-8") as handle:
         json.dump(summary, handle, indent=2, ensure_ascii=False)
     return summary
+
+
+def filter_records_by_min_steps(
+    records: Sequence[EpisodeRecord],
+    min_episode_steps: int,
+    split_label: str,
+) -> Tuple[List[EpisodeRecord], int, Dict[str, int]]:
+    """Filter short episodes and report per-task counts for one source split."""
+    short_episode_count = sum(1 for record in records if len(record.steps) < min_episode_steps)
+    filtered_records = [record for record in records if len(record.steps) >= min_episode_steps]
+
+    LOGGER.info(
+        "[%s] Keeping %d episodes with at least %d steps. Skipped %d short episodes.",
+        split_label,
+        len(filtered_records),
+        min_episode_steps,
+        short_episode_count,
+    )
+
+    per_task_counts: Dict[str, int] = {}
+    for record in filtered_records:
+        per_task_counts[record.task_name] = per_task_counts.get(record.task_name, 0) + 1
+    LOGGER.info("[%s] Task episode counts after filtering: %s", split_label, per_task_counts)
+
+    return filtered_records, short_episode_count, per_task_counts
+
+
+def merge_count_dicts(*count_dicts: Dict[str, int]) -> Dict[str, int]:
+    """Merge per-task count dictionaries for conversion_summary.json."""
+    merged: Dict[str, int] = {}
+    for count_dict in count_dicts:
+        for key, value in count_dict.items():
+            merged[key] = merged.get(key, 0) + int(value)
+    return merged
 
 
 def split_records(
@@ -815,6 +1079,8 @@ def main() -> None:
 
     if not 0.0 <= args.val_ratio < 1.0:
         raise ValueError("--val_ratio must satisfy 0.0 <= val_ratio < 1.0")
+    if args.zero_action_trailing_keep < 0:
+        raise ValueError("--zero_action_trailing_keep must be >= 0")
 
     prepare_output_root(args.output_root, args.overwrite)
 
@@ -826,28 +1092,68 @@ def main() -> None:
     instruction_mapping = load_instruction_mapping(args.instructions_json)
     task_prompts = load_task_prompts(args.task_prompts_json)
 
-    records = load_episode_records(args.input, args.pkl_glob, args.task_names)
-    LOGGER.info("Loaded %d raw episodes before filtering.", len(records))
+    raw_train_records = load_episode_records(
+        args.input,
+        args.pkl_glob,
+        args.task_names,
+        args.obs_state_key,
+        args.zero_action_trailing_keep,
+        task_prompts,
+    )
+    LOGGER.info("Loaded %d raw training episodes before filtering from %s.", len(raw_train_records), args.input)
 
-    short_episode_count = sum(1 for record in records if len(record.steps) < args.min_episode_steps)
-    records = [record for record in records if len(record.steps) >= args.min_episode_steps]
-    LOGGER.info(
-        "Keeping %d episodes with at least %d steps. Skipped %d short episodes.",
-        len(records),
+    train_source_records, train_short_episode_count, train_per_task_raw_counts = filter_records_by_min_steps(
+        raw_train_records,
         args.min_episode_steps,
-        short_episode_count,
+        "training input",
     )
 
-    if len(records) < 1:
-        raise ValueError("Need at least 1 episode after filtering.")
+    if len(train_source_records) < 1:
+        raise ValueError("Need at least 1 training episode after filtering.")
 
-    per_task_raw_counts: Dict[str, int] = {}
-    for record in records:
-        per_task_raw_counts[record.task_name] = per_task_raw_counts.get(record.task_name, 0) + 1
-    LOGGER.info("Task episode counts after filtering: %s", per_task_raw_counts)
+    raw_val_records: List[EpisodeRecord] = []
+    val_source_records: List[EpisodeRecord] = []
+    val_short_episode_count = 0
+    val_per_task_raw_counts: Dict[str, int] = {}
 
-    train_records, val_records = split_records(records, args.val_ratio, args.seed)
-    LOGGER.info("Episode split: %d train / %d validation", len(train_records), len(val_records))
+    if args.val_input is not None:
+        if args.val_input.resolve() == args.input.resolve():
+            raise ValueError("--val_input must be different from --input when using a separate validation directory.")
+
+        LOGGER.info(
+            "Using separate validation input directory %s. --val_ratio=%s will be ignored.",
+            args.val_input,
+            args.val_ratio,
+        )
+        raw_val_records = load_episode_records(
+            args.val_input,
+            args.pkl_glob,
+            args.task_names,
+            args.obs_state_key,
+            args.zero_action_trailing_keep,
+            task_prompts,
+        )
+        LOGGER.info("Loaded %d raw validation episodes before filtering from %s.", len(raw_val_records), args.val_input)
+
+        val_source_records, val_short_episode_count, val_per_task_raw_counts = filter_records_by_min_steps(
+            raw_val_records,
+            args.min_episode_steps,
+            "validation input",
+        )
+
+        if len(val_source_records) < 1:
+            raise ValueError("Need at least 1 validation episode after filtering.")
+
+        train_records = list(enumerate(train_source_records))
+        val_records = list(enumerate(val_source_records))
+        split_mode = "separate_validation_input"
+    else:
+        train_records, val_records = split_records(train_source_records, args.val_ratio, args.seed)
+        split_mode = "val_ratio"
+        LOGGER.info("Episode split by val_ratio=%s: %d train / %d validation", args.val_ratio, len(train_records), len(val_records))
+
+    per_task_raw_counts = merge_count_dicts(train_per_task_raw_counts, val_per_task_raw_counts)
+    LOGGER.info("Final conversion split mode: %s. Episode split: %d train / %d validation", split_mode, len(train_records), len(val_records))
 
     train_summary = write_split(
         "training",
@@ -866,6 +1172,8 @@ def main() -> None:
         include_right_ft=args.include_right_ft,
         force_slice=force_slice,
         torque_slice=torque_slice,
+        include_right_force_history=args.include_right_force_history,
+        right_force_history_key=args.right_force_history_key,
         action_source=args.action_source,
         action_slice=action_slice,
         prefer_intervene_action=args.prefer_intervene_action,
@@ -889,6 +1197,8 @@ def main() -> None:
         include_right_ft=args.include_right_ft,
         force_slice=force_slice,
         torque_slice=torque_slice,
+        include_right_force_history=args.include_right_force_history,
+        right_force_history_key=args.right_force_history_key,
         action_source=args.action_source,
         action_slice=action_slice,
         prefer_intervene_action=args.prefer_intervene_action,
@@ -898,16 +1208,35 @@ def main() -> None:
 
     overall_summary = {
         "input": str(args.input),
+        "val_input": str(args.val_input) if args.val_input is not None else None,
+        "split_mode": split_mode,
         "output_root": str(args.output_root),
         "task_name": args.task_name,
         "default_instruction": default_instruction,
         "robot_obs_dim": 13 if args.include_right_ft else 7,
         "include_right_ft": args.include_right_ft,
-        "num_raw_episodes": len(records) + short_episode_count,
-        "num_used_episodes": len(records),
-        "num_skipped_short_episodes": short_episode_count,
+        "include_right_force_history": args.include_right_force_history,
+        "right_force_history_key": args.right_force_history_key if args.include_right_force_history else None,
+        "zero_action_trailing_keep": args.zero_action_trailing_keep,
+        "num_raw_episodes": len(raw_train_records) + len(raw_val_records),
+        "num_used_episodes": len(train_source_records) + len(val_source_records),
+        "num_skipped_short_episodes": train_short_episode_count + val_short_episode_count,
         "task_prompts": task_prompts,
         "task_episode_count": per_task_raw_counts,
+        "train_source": {
+            "input": str(args.input),
+            "raw_episode_count": len(raw_train_records),
+            "used_episode_count": len(train_source_records),
+            "skipped_short_episode_count": train_short_episode_count,
+            "per_task_episode_count": train_per_task_raw_counts,
+        },
+        "validation_source": {
+            "input": str(args.val_input) if args.val_input is not None else None,
+            "raw_episode_count": len(raw_val_records),
+            "used_episode_count": len(val_source_records),
+            "skipped_short_episode_count": val_short_episode_count,
+            "per_task_episode_count": val_per_task_raw_counts,
+        },
         "train_split": {
             "episode_count": train_summary["saved_episode_count"],
             "step_count": train_summary["saved_step_count"],

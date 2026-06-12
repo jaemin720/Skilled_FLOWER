@@ -30,7 +30,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from preprocess.convert_multitask_raw_pkl_to_flower import (  # noqa: E402
+from flower_bed.Skill_flower.FLOWER_Calvin_Custom.preprocess.convert_multitask_raw_pkl_to_flower import (  # noqa: E402
     EpisodeRecord,
     build_rel_action,
     load_episode_records,

@@ -104,7 +104,7 @@ def train(cfg: DictConfig) -> None:
         
         # Log configuration
         log_rank_0(f"Training config for seed {cfg.seed}:\n{cfg}")
-        log_rank_0(f"Git commit: {get_git_commit_hash(Path(hydra.utils.to_absolute_path(__file__)))}")
+        #log_rank_0(f"Git commit: {get_git_commit_hash(Path(hydra.utils.to_absolute_path(__file__)))}")
         log_rank_0(print_system_env_info())
                 
         # Clear CUDA cache again before training

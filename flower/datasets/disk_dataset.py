@@ -4,7 +4,7 @@ from pathlib import Path
 import pickle
 from typing import Any, Dict, List, Tuple, Optional
 import random
-import os 
+import os
 from collections import defaultdict
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -169,6 +169,11 @@ class ExtendedDiskDataset(DiskDataset):
         future_range: int,
         use_extracted_rel_actions: bool = False,
         extracted_dir: str = 'extracted/',
+        load_force_history: bool = False,
+        force_history_key: str = "right_force_history",
+        load_bbox: bool = False,
+        bbox_key: str = "bbox",
+        bbox_rgb_key: str = "rgb_static",
         **kwargs: Any,
     ):
         super().__init__(*args, **kwargs)
@@ -178,6 +183,11 @@ class ExtendedDiskDataset(DiskDataset):
         self.ep_start_end_ids = np.load(self.abs_datasets_dir / "ep_start_end_ids.npy")  # Load sequence boundaries
         # Using extracted npy to reduce bandwidth of data loading
         self.use_extracted_rel_actions = use_extracted_rel_actions
+        self.load_force_history = bool(load_force_history)
+        self.force_history_key = force_history_key
+        self.load_bbox = bool(load_bbox)
+        self.bbox_key = bbox_key
+        self.bbox_rgb_key = bbox_rgb_key
         if use_extracted_rel_actions:
             self.extracted_dir = extracted_dir
             if not os.path.exists(extracted_dir):  # maybe a relative path
@@ -190,7 +200,7 @@ class ExtendedDiskDataset(DiskDataset):
                 # key: int, original episode fn's index; value: int, extracted npy's inner index
             self.extracted_ep_rel_actions: np.ndarray = np.load(os.path.join(self.extracted_dir, "ep_rel_actions.npy"))
             logger.info(f"Extracted files loaded from {self.extracted_dir}")
-        
+
     def find_sequence_boundaries(self, idx: int) -> Tuple[int, int]:
         for start_idx, end_idx in self.ep_start_end_ids:
             if start_idx <= idx < end_idx:
@@ -225,9 +235,9 @@ class ExtendedDiskDataset(DiskDataset):
 
         episode = {}
         for key in keys:
-            
+
             stacked_data = np.stack([ep[key] for ep in episodes])
-            
+
             if not self.use_extracted_rel_actions:
                 stacked_data = np.stack([ep[key] for ep in episodes])
                 if key == "rel_actions" or key == 'actions':
@@ -240,14 +250,74 @@ class ExtendedDiskDataset(DiskDataset):
                 else:
                     episode[key] = stacked_data[:self.obs_seq_len, :]
 
+        if self.load_bbox:
+            obs_episodes = episodes[: self.obs_seq_len]
+            missing = [
+                i
+                for i, ep in enumerate(obs_episodes)
+                if self.bbox_key not in (ep.files if hasattr(ep, "files") else ep)
+            ]
+            if missing:
+                raise KeyError(
+                    f"bbox key '{self.bbox_key}' is missing in "
+                    f"{len(missing)} observation frame(s) under {self.abs_datasets_dir}"
+                )
+            bbox_frames = []
+            for ep in obs_episodes:
+                frame_bbox = np.asarray(ep[self.bbox_key], dtype=np.float32)
+                if frame_bbox.ndim == 2 and frame_bbox.shape[0] == 1:
+                    frame_bbox = frame_bbox[0]
+                bbox_frames.append(frame_bbox)
+            bbox = np.stack(bbox_frames, axis=0).astype(np.float32)
+            if bbox.ndim != 2 or bbox.shape[-1] != 4:
+                raise ValueError(f"{self.bbox_key} should have shape [obs_seq_len,4], got {bbox.shape}")
+            episode[self.bbox_key] = bbox
+
+        if self.load_force_history:
+            obs_episodes = episodes[: self.obs_seq_len]
+            missing = [
+                i
+                for i, ep in enumerate(obs_episodes)
+                if self.force_history_key not in (ep.files if hasattr(ep, "files") else ep)
+            ]
+            if missing:
+                raise KeyError(
+                    f"force history key '{self.force_history_key}' is missing in "
+                    f"{len(missing)} observation frame(s) under {self.abs_datasets_dir}"
+                )
+            force_history = np.stack(
+                [np.asarray(ep[self.force_history_key], dtype=np.float32) for ep in obs_episodes],
+                axis=0,
+            )
+            if force_history.ndim != 3:
+                raise ValueError(
+                    f"{self.force_history_key} should have shape [obs_seq_len,T,6], "
+                    f"got {force_history.shape}"
+                )
+            episode["right_force_history"] = force_history
+
+        # SKILL_VAE_ADALN MOD:
+        # Flow target actions는 current_t부터 시작하지만,
+        # SkillVAE history는 current_t 이전 action 32개만 사용합니다.
+        current_t = start_idx + self.obs_seq_len - 1
+
+        skill_history = self._build_skill_prev_history(
+            current_t=current_t,
+            history_len=32,
+            action_dim=7,
+            gripper_state_obs_idx=6,
+        )
+
+        episode.update(skill_history)
+
         if self.with_lang:
             episode["language"] = self.lang_ann[self.lang_lookup[idx]][0]  # TODO check  [0]
             episode["language_text"] = self.lang_text[self.lang_lookup[idx]] #[0]  # TODO check  [0]
-        
+
 
         return episode
-       
-    
+
+
     def merge_episodes(self, episode1: Dict[str, np.ndarray], episode2: Dict[str, np.ndarray]) -> Dict[str, np.ndarray]:
         merged_episode = {}
         all_keys = set(episode1.keys()).union(set(episode2.keys()))
@@ -260,7 +330,7 @@ class ExtendedDiskDataset(DiskDataset):
             else:
                 merged_episode[key] = episode2[key]
         return merged_episode
-    
+
     def _build_file_indices(self, abs_datasets_dir: Path) -> np.ndarray:
         """
         This method builds the mapping from index to file_name used for loading the episodes of the non language
@@ -284,6 +354,79 @@ class ExtendedDiskDataset(DiskDataset):
                 episode_lookup.append(idx)
         return np.array(episode_lookup)
 
+    def _load_rel_action_at(self, file_idx: int) -> np.ndarray:
+        # SKILL_VAE_ADALN MOD: SkillVAE action history를 만들기 위해 특정 timestep의 rel_actions만 읽습니다.
+        # use_extracted_rel_actions=True이면 기존 extracted ep_rel_actions.npy를 재사용합니다.
+        if self.use_extracted_rel_actions:
+            ex_idx = self.extracted_ep_npz_name_to_npy_idx[file_idx]
+            return self.extracted_ep_rel_actions[ex_idx].astype(np.float32)
+
+        ep = self.load_file(self._get_episode_name(file_idx))
+        return np.asarray(ep["rel_actions"], dtype=np.float32)
+
+
+    def _load_robot_obs_at(self, file_idx: int) -> np.ndarray:
+        # SKILL_VAE_ADALN MOD: gripper relabeling용 gripper state를 얻기 위해 robot_obs를 읽습니다.
+        ep = self.load_file(self._get_episode_name(file_idx))
+        return np.asarray(ep["robot_obs"], dtype=np.float32)
+
+
+    def _build_skill_prev_history(
+        self,
+        current_t: int,
+        history_len: int = 32,
+        action_dim: int = 7,
+        gripper_state_obs_idx: int = 6,
+    ) -> Dict[str, np.ndarray]:
+        # SKILL_VAE_ADALN MOD:
+        # current_t 직전까지의 과거 action만 SkillVAE conditioner로 사용합니다.
+        # current_t action은 Flow target의 첫 action이므로 history에 넣으면 leakage입니다.
+        ep_start, _ = self.find_sequence_boundaries(current_t)
+
+        hist = np.zeros((history_len, action_dim), dtype=np.float32)
+        valid = np.zeros((history_len,), dtype=np.float32)
+        gripper_states = np.zeros((history_len,), dtype=np.float32)
+
+        # SKILL_VAE_ADALN MOD:
+        # padding action은 [0,0,0,0,0,0,1]로 설정합니다.
+        # 실제 과거 action이 채워지는 위치는 아래 hist[-n:] = rel_actions에서 덮어써집니다.
+        gripper_action_idx = action_dim - 1
+        hist[:, gripper_action_idx] = 1.0
+
+        hist_start = max(ep_start, current_t - history_len)
+        hist_indices = list(range(hist_start, current_t))
+
+        if len(hist_indices) == 0:
+            return {
+                "skill_prev_actions": hist,
+                "skill_prev_valid_mask": valid,
+                "skill_prev_gripper_states": gripper_states,
+            }
+
+        rel_actions = np.stack(
+            [self._load_rel_action_at(i) for i in hist_indices],
+            axis=0,
+        ).astype(np.float32)
+
+        robot_obs = np.stack(
+            [self._load_robot_obs_at(i) for i in hist_indices],
+            axis=0,
+        ).astype(np.float32)
+
+        n = len(hist_indices)
+        hist[-n:] = rel_actions
+        valid[-n:] = 1.0
+
+        # preprocess에서 robot_obs는 pose 6D + gripper 1D + optional F/T 순서이므로
+        # include_right_ft 여부와 상관없이 gripper는 robot_obs[6]입니다.
+        gripper_states[-n:] = robot_obs[:, gripper_state_obs_idx]
+
+        return {
+            "skill_prev_actions": hist,
+            "skill_prev_valid_mask": valid,
+            "skill_prev_gripper_states": gripper_states,
+        }
+
 
 
 
@@ -296,34 +439,34 @@ class SubsetDiskDataset(ExtendedDiskDataset):
         **kwargs
     ):
         super().__init__(*args, **kwargs)
-        
+
         # Set random seed for reproducibility
         if subset_seed is not None:
             np.random.seed(subset_seed)
-            
+
         # Get total number of episodes
         total_episodes = len(self.episode_lookup)
-        
+
         # Calculate number of episodes for subset
         num_subset_episodes = int(total_episodes * subset_percentage)
-        
+
         # Randomly select subset of episodes
         subset_indices = np.random.choice(
-            total_episodes, 
+            total_episodes,
             size=num_subset_episodes,
             replace=False
         )
-        
+
         # Update episode lookup to only include subset
         self.episode_lookup = self.episode_lookup[subset_indices]
-        
+
         print(f"Using {num_subset_episodes}/{total_episodes} episodes ({subset_percentage*100:.1f}%)")
-        
+
     def _build_file_indices(self, abs_datasets_dir: Path):
         """Override parent method to ensure proper episode indexing"""
         episode_lookup = super()._build_file_indices(abs_datasets_dir)
         return episode_lookup
-    
+
 
 
 class LabeledSubsetDiskDataset(ExtendedDiskDataset):
@@ -335,32 +478,32 @@ class LabeledSubsetDiskDataset(ExtendedDiskDataset):
         **kwargs
     ):
         super().__init__(*args, **kwargs)
-        
+
         if subset_seed is not None:
             np.random.seed(subset_seed)
-            
+
         # Get language annotations
         lang_data = np.load(self.abs_datasets_dir / self.lang_folder / "auto_lang_ann.npy", allow_pickle=True).item()
         labeled_episodes = lang_data["info"]["indx"]
-        
+
         # Get indices of labeled episodes
         labeled_indices = []
         for start_idx, end_idx in labeled_episodes:
             labeled_indices.extend(range(start_idx, end_idx + 1))
         labeled_indices = np.array(labeled_indices)
-        
+
         # Find which episodes in episode_lookup are labeled
         labeled_mask = np.isin(self.episode_lookup, labeled_indices)
         labeled_episode_indices = np.where(labeled_mask)[0]
-        
+
         # Sample subset of labeled episodes
         num_labeled = len(labeled_episode_indices)
         num_subset = int(num_labeled * subset_percentage)
         subset_indices = np.random.choice(labeled_episode_indices, size=num_subset, replace=False)
-        
+
         # Update episode lookup
         self.episode_lookup = self.episode_lookup[subset_indices]
-        
+
         print(f"Using {num_subset}/{num_labeled} labeled episodes ({subset_percentage*100:.1f}%)")
 
 
@@ -375,24 +518,24 @@ class BalancedLabeledSubsetDataset(ExtendedDiskDataset):
         **kwargs
     ):
         super().__init__(*args, **kwargs)
-        
+
         if subset_seed is not None:
             np.random.seed(subset_seed)
-            
+
         # Load language annotations
         lang_data = np.load(self.abs_datasets_dir / self.lang_folder / "auto_lang_ann.npy", allow_pickle=True).item()
-        
+
         # Create mapping of tasks to episodes
         task_to_episodes = defaultdict(list)
         for i, (start_idx, end_idx) in enumerate(lang_data["info"]["indx"]):
             task = lang_data["language"]["task"][i]
             task_to_episodes[task].extend(range(start_idx, end_idx + 1))
-            
+
         # Print task distribution in original dataset
         print("\nOriginal task distribution:")
         for task, episodes in task_to_episodes.items():
             print(f"{task}: {len(episodes)} episodes")
-            
+
         # Sample balanced subset for each task
         selected_episodes = []
         for task, episodes in task_to_episodes.items():
@@ -404,21 +547,21 @@ class BalancedLabeledSubsetDataset(ExtendedDiskDataset):
             else:
                 sampled = np.random.choice(episodes, size=num_to_sample, replace=False)
             selected_episodes.extend(sampled)
-            
+
         # Find indices in episode_lookup that correspond to selected episodes
         selected_mask = np.isin(self.episode_lookup, selected_episodes)
         selected_indices = np.where(selected_mask)[0]
-        
+
         # Update episode lookup
         self.episode_lookup = self.episode_lookup[selected_indices]
-        
+
         # Print final distribution
         print("\nSelected subset task distribution:")
         selected_episode_set = set(selected_episodes)
         for task, episodes in task_to_episodes.items():
             num_selected = len(set(episodes) & selected_episode_set)
             print(f"{task}: {num_selected} episodes")
-            
+
         total_original = sum(len(episodes) for episodes in task_to_episodes.values())
         print(f"\nTotal selected episodes: {len(selected_episodes)}/{total_original} "
               f"({len(selected_episodes)/total_original*100:.1f}%)")
@@ -427,13 +570,13 @@ class BalancedLabeledSubsetDataset(ExtendedDiskDataset):
         """Helper method to verify task coverage in selected episodes"""
         task_coverage = defaultdict(int)
         selected_episode_set = set(selected_episodes)
-        
+
         for i, (start_idx, end_idx) in enumerate(lang_data["info"]["indx"]):
             task = lang_data["language"]["task"][i]
             episode_range = set(range(start_idx, end_idx + 1))
             if episode_range & selected_episode_set:
                 task_coverage[task] += 1
-                
+
         uncovered_tasks = set(lang_data["language"]["task"]) - set(task_coverage.keys())
         if uncovered_tasks:
             print(f"Warning: The following tasks have no episodes in the subset: {uncovered_tasks}")

@@ -12,15 +12,18 @@ token_dropout: 0.1  # Added token dropout parameter
 # Model Structure
 multistep: ${multistep}
 num_sampling_steps: 4
-lowdim_obs_dim: 13 # ft 있으면 13 / 없으면 7
+lowdim_obs_dim: 7
 action_dim: 7
-act_window_size: 10
+act_window_size: ${act_seq_len}
+
+# SkillVAE AdaLN Conditioning
+use_skill_vae_adaln: false
+use_skill_vae_adaln_conv1d: false
 
 # pretraining stuff
-load_pretrained: True
-pretrained_model_path: /home/jack/flower_vla_calvin/flower_vla_pret/360000_model_weights.pt
-# /home/hk-project-sustainebot/ft4740/code/flower_vla/logs/runs/2025-02-19/11-15-41/200000_model_weights.pt
-# /home/hk-project-sustainebot/ft4740/code/flower_vla_policy/logs/runs/2025-02-05/10-17-02/360000_model_weights.pt joint + delta pret
+load_pretrained: false
+pretrained_model_path: null
+
 # Model flags
 use_second_view: True
 second_view_key: image_wrist
@@ -30,6 +33,7 @@ use_cross_attn: True
 use_adaln_cond: false
 use_readout_token: false
 use_proprio: True
+round_robin_conditioning: false
 return_act_chunk: false
 
 # DiT Configuration
@@ -40,6 +44,11 @@ n_layers: 12
 attn_pdrop: 0.1
 resid_pdrop: 0.1
 mlp_pdrop: 0.1
+
+# Auxiliary BBox Loss
+bbox_loss: false
+bbox_loss_weight: 0.05
+bbox_key: bbox
 
 # RoPE Configuration
 use_rope: true

@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
-
+from torchvision.transforms import functional as TF
 
 class ScaleImageTensor(object):
     """Scale tensor of shape (batch, C, H, W) containing images to [0, 1] range
@@ -74,6 +74,9 @@ class RandomShiftsAug(nn.Module):
     def __init__(self, pad):
         super().__init__()
         self.pad = pad
+        self.last_sample_shift_pixels = None
+        self.last_content_shift_pixels = None
+        self.last_image_hw = None
 
     def forward(self, x):
         x = x.float()
@@ -87,11 +90,36 @@ class RandomShiftsAug(nn.Module):
         base_grid = torch.cat([arange, arange.transpose(1, 0)], dim=2)
         base_grid = base_grid.unsqueeze(0).repeat(n, 1, 1, 1)
 
-        shift = torch.randint(0, 2 * self.pad + 1, size=(n, 1, 1, 2), device=x.device, dtype=x.dtype)
-        shift *= 2.0 / (h + 2 * self.pad)
+        shift_pixels = torch.randint(0, 2 * self.pad + 1, size=(n, 1, 1, 2), device=x.device, dtype=x.dtype)
+        self.last_sample_shift_pixels = shift_pixels.view(n, 2).detach()
+        self.last_content_shift_pixels = (self.pad - self.last_sample_shift_pixels).detach()
+        self.last_image_hw = (h, w)
+        shift = shift_pixels * 2.0 / (h + 2 * self.pad)
 
         grid = base_grid + shift
         return F.grid_sample(x, grid, padding_mode="zeros", align_corners=False)
+
+
+class RatioCenterCrop(nn.Module):
+    def __init__(self, size, cx=0.5, cy=0.5):
+        super().__init__()
+        if isinstance(size, int):
+            self.size = (size, size)
+        else:
+            self.size = tuple(size)
+        self.cx = float(cx)
+        self.cy = float(cy)
+
+    def forward(self, x):
+        _, h, w = TF.get_dimensions(x)
+        crop_h, crop_w = self.size
+        center_x = self.cx * w
+        center_y = self.cy * h
+        left = int(round(center_x - crop_w / 2.0))
+        top = int(round(center_y - crop_h / 2.0))
+        left = max(0, min(left, w - crop_w))
+        top = max(0, min(top, h - crop_h))
+        return TF.crop(x, top, left, crop_h, crop_w)
 
 
 class RelativeActions(object):

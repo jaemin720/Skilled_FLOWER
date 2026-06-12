@@ -139,7 +139,13 @@ class BaseDataset(Dataset):
         episode = self._load_episode(idx, window_size)
 
         seq_state_obs = process_state(episode, self.observation_space, self.transforms, self.proprio_state)
-        seq_rgb_obs = process_rgb(episode, self.observation_space, self.transforms)
+        seq_rgb_obs = process_rgb(
+            episode,
+            self.observation_space,
+            self.transforms,
+            bbox_key=getattr(self, "bbox_key", "bbox"),
+            bbox_rgb_key=getattr(self, "bbox_rgb_key", "rgb_static"),
+        )
         seq_depth_obs = process_depth(episode, self.observation_space, self.transforms)
         seq_acts = process_actions(episode, self.observation_space, self.transforms)
         info = get_state_info_dict(episode)
@@ -147,6 +153,23 @@ class BaseDataset(Dataset):
         info = self._add_language_info(info, idx)
         seq_dict = {**seq_state_obs, **seq_rgb_obs, **seq_depth_obs, **seq_acts, **info, **seq_lang}  # type:ignore
         seq_dict["idx"] = idx  # type:ignore
+
+        # SKILL_VAE_ADALN MOD:
+        # SkillVAE AdaLN conditioner용 action history를 최종 batch로 전달합니다.
+        # Flow Transformer target인 seq_dict["actions"]와 완전히 별도입니다.
+        for key in (
+            "skill_prev_actions",
+            "skill_prev_valid_mask",
+            "skill_prev_gripper_states",
+            "right_force_history",
+            getattr(self, "bbox_key", "bbox"),
+        ):
+            if key in episode:
+                if torch.is_tensor(episode[key]):
+                    seq_dict[key] = episode[key].float()
+                else:
+                    seq_dict[key] = torch.from_numpy(episode[key]).float()
+
         return seq_dict
 
     def _load_episode(self, idx: int, window_size: int) -> Dict[str, np.ndarray]:

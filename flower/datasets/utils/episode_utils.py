@@ -2,13 +2,93 @@ import logging
 import os
 from pathlib import Path
 import re
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
 
 import numpy as np
 from omegaconf import DictConfig, ListConfig, OmegaConf
 import torch
 
 logger = logging.getLogger(__name__)
+
+def _iter_transforms(transform: Any):
+    if hasattr(transform, "transforms"):
+        return transform.transforms
+    if isinstance(transform, (list, tuple)):
+        return transform
+    return [transform]
+
+
+def _shift_bbox_cxcywh(
+    bbox: np.ndarray,
+    content_shift_pixels: torch.Tensor,
+    image_hw: Tuple[int, int],
+) -> np.ndarray:
+    """Apply an image translation to normalized cxcywh bbox targets."""
+    if bbox is None:
+        return bbox
+
+    shift = content_shift_pixels.detach()
+    bbox_tensor = torch.as_tensor(bbox, device=shift.device, dtype=shift.dtype)
+    if bbox_tensor.shape[-1] != 4:
+        raise ValueError(f"bbox should have last dim 4 for cxcywh, got {tuple(bbox_tensor.shape)}")
+
+    squeeze = False
+    if bbox_tensor.dim() == 1:
+        bbox_tensor = bbox_tensor.unsqueeze(0)
+        shift = shift[-1:].contiguous()
+        squeeze = True
+    elif bbox_tensor.shape[0] != shift.shape[0]:
+        if bbox_tensor.shape[0] == 1:
+            shift = shift[-1:].expand(1, -1).contiguous()
+        elif shift.shape[0] == 1:
+            shift = shift.expand(bbox_tensor.shape[0], -1).contiguous()
+        else:
+            raise ValueError(
+                f"bbox sequence length ({bbox_tensor.shape[0]}) does not match random shift length ({shift.shape[0]})"
+            )
+
+    height, width = image_hw
+    scale = torch.tensor([width, height], device=bbox_tensor.device, dtype=bbox_tensor.dtype)
+    delta = shift.to(dtype=bbox_tensor.dtype) / scale
+    while delta.dim() < bbox_tensor.dim():
+        delta = delta.unsqueeze(-2)
+
+    center = bbox_tensor[..., :2]
+    size = bbox_tensor[..., 2:].clamp_min(0.0)
+    xy_min = center - 0.5 * size + delta
+    xy_max = center + 0.5 * size + delta
+    xy_min = xy_min.clamp(0.0, 1.0)
+    xy_max = xy_max.clamp(0.0, 1.0)
+
+    adjusted_size = (xy_max - xy_min).clamp_min(0.0)
+    adjusted_center = 0.5 * (xy_min + xy_max)
+    adjusted = torch.cat([adjusted_center, adjusted_size], dim=-1)
+    if squeeze:
+        adjusted = adjusted.squeeze(0)
+    return adjusted.cpu().numpy().astype(np.float32)
+
+
+def _apply_rgb_transforms(
+    image: torch.Tensor,
+    transform: Any,
+    episode: Dict[str, np.ndarray],
+    rgb_obs_key: str,
+    bbox_key: str,
+    bbox_rgb_key: str,
+) -> torch.Tensor:
+    for transform_step in _iter_transforms(transform):
+        image = transform_step(image)
+        if bbox_key not in episode or rgb_obs_key != bbox_rgb_key:
+            continue
+        if transform_step.__class__.__name__ != "RandomShiftsAug":
+            continue
+
+        content_shift_pixels = getattr(transform_step, "last_content_shift_pixels", None)
+        image_hw = getattr(transform_step, "last_image_hw", None)
+        if content_shift_pixels is None or image_hw is None:
+            raise RuntimeError("RandomShiftsAug did not record shift metadata for bbox adjustment.")
+        episode[bbox_key] = _shift_bbox_cxcywh(episode[bbox_key], content_shift_pixels, image_hw)
+    return image
 
 
 def process_state(
@@ -66,6 +146,8 @@ def process_rgb(
     seq_idx: int = 0,
     window_size: int = 0,
     device: torch.device = None,
+    bbox_key: str = "bbox",
+    bbox_rgb_key: str = "rgb_static",
 ) -> Dict[str, Dict[str, torch.Tensor]]:
     rgb_obs_keys = observation_space["rgb_obs"]
     seq_rgb_obs_dict = {}
@@ -85,7 +167,14 @@ def process_rgb(
             seq_rgb_obs_ = torch.from_numpy(rgb_obs[seq_idx : seq_idx + window_size]).byte().permute(0, 3, 1, 2).to(device)
         # we might have different transformations for the different cameras
         if rgb_obs_key in transforms:
-            seq_rgb_obs_ = transforms[rgb_obs_key](seq_rgb_obs_)
+            seq_rgb_obs_ = _apply_rgb_transforms(
+                seq_rgb_obs_,
+                transforms[rgb_obs_key],
+                episode,
+                rgb_obs_key,
+                bbox_key,
+                bbox_rgb_key,
+            )
         seq_rgb_obs_dict[rgb_obs_key] = seq_rgb_obs_
     # shape: N_rgb_obs x (BxCxHxW)
     return {"rgb_obs": seq_rgb_obs_dict}

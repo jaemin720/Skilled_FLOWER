@@ -2,6 +2,8 @@ import argparse
 import importlib
 import json
 import logging
+import pickle
+from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -11,11 +13,11 @@ import numpy as np
 import torch
 import torchvision
 import uvicorn
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse, Response
 from omegaconf import OmegaConf
 
-from flower.datasets.utils.episode_utils import (
+from flower_bed.Skill_flower.FLOWER_Calvin_Custom.flower.datasets.utils.episode_utils import (
     load_dataset_statistics,
     process_rgb,
     process_state,
@@ -28,6 +30,19 @@ LOGGER = logging.getLogger("server_flower")
 
 def json_response(obj: Any) -> JSONResponse:
     return JSONResponse(json.loads(json_numpy.dumps(obj)))
+
+
+def npy_response(array: np.ndarray) -> Response:
+    buffer = BytesIO()
+    np.save(buffer, np.asarray(array, dtype=np.float32), allow_pickle=False)
+    return Response(content=buffer.getvalue(), media_type="application/octet-stream")
+
+
+def load_pickle_payload(raw_body: bytes) -> dict:
+    payload = pickle.loads(raw_body)
+    if not isinstance(payload, dict):
+        raise TypeError(f"Expected dict payload, got {type(payload)!r}")
+    return payload
 
 
 def load_class(name: str):
@@ -94,8 +109,36 @@ def build_val_transforms(cfg, dataset_root: Optional[Path]) -> Dict[str, torchvi
     return val_transforms
 
 
+def infer_kept_proprio_dim(proprio_state) -> Optional[int]:
+    if proprio_state is None or "keep_indices" not in proprio_state:
+        return None
+
+    dim = 0
+    for slice_ids in proprio_state.keep_indices:
+        start, end = int(slice_ids[0]), int(slice_ids[1])
+        dim += end - start
+    return dim
+
+
+def infer_required_proprio_dim(proprio_state) -> Optional[int]:
+    if proprio_state is None or "keep_indices" not in proprio_state:
+        return None
+
+    required = 0
+    for slice_ids in proprio_state.keep_indices:
+        required = max(required, int(slice_ids[1]))
+    return required
+
+
+def find_payload_value(payload: dict, *keys: str):
+    for key in keys:
+        if key in payload:
+            return payload[key]
+    return None
+
+
 def apply_ema_weights(model: torch.nn.Module, checkpoint_path: Path) -> None:
-    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    checkpoint = torch.load(checkpoint_path, map_location="cpu",weights_only=False)
     ema_weights = checkpoint.get("callbacks", {}).get("EMA", {}).get("ema_weights")
     if ema_weights is None:
         LOGGER.info("No EMA weights found in %s; using checkpoint state_dict.", checkpoint_path)
@@ -143,11 +186,22 @@ def load_model(
     model_cfg["second_view_key"] = "rgb_gripper"
 
     model_class = load_class(class_name)
-    model = model_class.load_from_checkpoint(
-        str(checkpoint_path),
-        map_location=device,
-        **model_cfg,
-    )
+
+    _orig_torch_load = torch.load
+
+    def _torch_load_weights_only_false(*args, **kwargs):
+        kwargs.setdefault("weights_only", False)
+        return _orig_torch_load(*args, **kwargs)
+
+    torch.load = _torch_load_weights_only_false
+    try:
+        model = model_class.load_from_checkpoint(
+            str(checkpoint_path),
+            map_location=device,
+            **model_cfg,
+        )
+    finally:
+        torch.load = _orig_torch_load
 
     if use_ema_weights:
         apply_ema_weights(model, checkpoint_path)
@@ -171,12 +225,20 @@ class FlowerInferenceServer:
         cfg_use_wrist = bool(self.cfg.model.get("use_second_view", False))
         self.use_wrist = cfg_use_wrist if args.use_wrist is None else args.use_wrist
         self.use_proprio = bool(self.cfg.model.get("use_proprio", False))
+        self.use_force_history_adaln = bool(self.cfg.model.get("use_force_history_adaln", False))
         self.observation_space = self.cfg.datamodule.observation_space
         self.proprio_state = self.cfg.datamodule.proprioception_dims
+        self.expected_proprio_dim = infer_kept_proprio_dim(self.proprio_state)
+        self.required_proprio_dim = infer_required_proprio_dim(self.proprio_state)
+        self.accepted_proprio_dims = {
+            dim for dim in (self.expected_proprio_dim, self.required_proprio_dim) if dim is not None
+        }
 
         dataset_root = Path(args.dataset_root).resolve() if args.dataset_root else None
         self.transforms = build_val_transforms(self.cfg, dataset_root)
         self.prompt_text: Optional[str] = None
+        self.debug_force_history_prints = max(0, int(args.debug_force_history_prints))
+        self._debug_force_history_count = 0
 
         self.model = load_model(
             checkpoint_path=self.checkpoint_path,
@@ -195,6 +257,9 @@ class FlowerInferenceServer:
         LOGGER.info("Device: %s", self.device)
         LOGGER.info("Using wrist view: %s", self.use_wrist)
         LOGGER.info("Using proprio: %s", self.use_proprio)
+        LOGGER.info("Using force-history AdaLN: %s", self.use_force_history_adaln)
+        if self.use_proprio:
+            LOGGER.info("Accepted proprio dims: %s", sorted(self.accepted_proprio_dims))
 
         if args.data_name:
             LOGGER.warning("--data_name is ignored by this server.")
@@ -215,6 +280,41 @@ class FlowerInferenceServer:
         self.prompt_text = text
         self.model.reset()
 
+    def _resolve_proprio_state(self, robot_obs: np.ndarray):
+        incoming_dim = int(robot_obs.shape[-1])
+        if self.accepted_proprio_dims and incoming_dim not in self.accepted_proprio_dims:
+            raise ValueError(
+                f"Received proprio dim {incoming_dim}, but checkpoint expects one of "
+                f"{sorted(self.accepted_proprio_dims)}. For the force-history checkpoint, send "
+                "7D right pose+gripper proprio [x,y,z,r,p,y,gripper]; the server will slice "
+                "it to the 5D model proprio via the checkpoint keep_indices."
+            )
+
+        if incoming_dim == self.expected_proprio_dim:
+            proprio_state = OmegaConf.create(OmegaConf.to_container(self.proprio_state, resolve=True))
+            proprio_state.keep_indices = [[0, incoming_dim]]
+            if "n_state_obs" in proprio_state:
+                proprio_state.n_state_obs = incoming_dim
+            return proprio_state
+
+        return self.proprio_state
+
+    def _normalize_force_history(self, force_history) -> torch.Tensor:
+        history = np.asarray(force_history, dtype=np.float32)
+        while history.ndim > 2 and history.shape[0] == 1:
+            history = history[0]
+
+        if history.ndim == 1 and history.size % 6 == 0:
+            history = history.reshape(-1, 6)
+
+        if history.ndim != 2 or history.shape[-1] != 6:
+            raise ValueError(
+                "right_force_history must have shape [T,6] or [1,T,6]; "
+                f"got {history.shape}"
+            )
+
+        return torch.from_numpy(np.ascontiguousarray(history)).to(self.device).unsqueeze(0)
+
     def _build_observation(self, payload: dict) -> dict:
         image_primary = payload.get("image_primary", payload.get("image", payload.get("rgb_static")))
         image_wrist = payload.get(
@@ -222,11 +322,22 @@ class FlowerInferenceServer:
             payload.get("wrist_image", payload.get("rgb_gripper")),
         )
         proprio = payload.get("proprio", payload.get("state", payload.get("robot_obs")))
+        force_history = find_payload_value(
+            payload,
+            "right_force_history",
+            "force_history",
+            "right_ft_history",
+        )
 
         if image_primary is None:
             raise ValueError("Observation must contain image_primary, image, or rgb_static.")
         if self.use_proprio and proprio is None:
             raise ValueError("Observation must contain proprio, state, or robot_obs.")
+        if self.use_force_history_adaln and force_history is None:
+            raise ValueError(
+                "Checkpoint uses force-history AdaLN; observation must contain "
+                "right_force_history with shape [T,6] or [1,T,6]."
+            )
         if self.use_wrist and image_wrist is None:
             raise ValueError(
                 "Checkpoint expects a wrist view; provide image_wrist, wrist_image, or rgb_gripper."
@@ -249,20 +360,29 @@ class FlowerInferenceServer:
 
         if self.use_proprio:
             robot_obs = np.asarray(proprio, dtype=np.float32).reshape(1, -1)
+            proprio_state = self._resolve_proprio_state(robot_obs)
             state_obs = process_state(
                 {"robot_obs": robot_obs},
                 self.observation_space,
                 self.transforms,
-                self.proprio_state,
+                proprio_state,
             )["robot_obs"]
             observation["robot_obs"] = state_obs.to(self.device).unsqueeze(0)
             observation["robot_obs_raw"] = torch.from_numpy(robot_obs.squeeze(0)).to(self.device)
 
-        print("[Server] use_proprio:", self.use_proprio)
-        print("[Server] observation keys:", observation.keys())
-        if "robot_obs" in observation:
-            print("[Server] robot_obs shape:", observation["robot_obs"].shape)
-            print("[Server] robot_obs_raw:", observation["robot_obs_raw"])
+        if force_history is not None:
+            observation["right_force_history"] = self._normalize_force_history(force_history)
+            if self._debug_force_history_count < self.debug_force_history_prints:
+                fh = observation["right_force_history"]
+                print(
+                    "[SERVER force_history] "
+                    f"shape={tuple(fh.shape)}, dtype={fh.dtype}, "
+                    f"last={np.array2string(fh[0, -1].detach().cpu().numpy(), precision=4, suppress_small=True)}, "
+                    f"min={float(fh.min().detach().cpu()):.4f}, "
+                    f"max={float(fh.max().detach().cpu()):.4f}",
+                    flush=True,
+                )
+                self._debug_force_history_count += 1
 
         return observation
 
@@ -274,8 +394,14 @@ class FlowerInferenceServer:
         obs = self._build_observation(obs_payload)
         goal = {"lang_text": self.prompt_text}
 
-        with torch.no_grad():
-            action = self.model.step(obs, goal)
+        autocast_context = (
+            torch.autocast(device_type="cuda", dtype=torch.bfloat16)
+            if self.device.type == "cuda"
+            else torch.autocast(device_type="cpu", enabled=False)
+        )
+        with torch.inference_mode():
+            with autocast_context:
+                action = self.model.step(obs, goal)
 
         action_np = action.detach().cpu().numpy().astype(np.float32)
         return np.squeeze(action_np)
@@ -305,11 +431,17 @@ def build_app(server: FlowerInferenceServer) -> FastAPI:
     def query(payload: Dict[str, Any]):
         try:
             action = server.infer(payload)
+            return json_response({"actions": action})
+        except Exception as exc:
+            LOGGER.exception("Inference failed")
+            return JSONResponse({"error": str(exc)}, status_code=500)
 
-            if isinstance(action, np.ndarray):
-                action = action.tolist()
-
-            return JSONResponse({"actions": action})
+    @app.post("/query_pickle")
+    async def query_pickle(request: Request):
+        try:
+            payload = load_pickle_payload(await request.body())
+            action = server.infer(payload)
+            return npy_response(action)
         except Exception as exc:
             LOGGER.exception("Inference failed")
             return JSONResponse({"error": str(exc)}, status_code=500)
@@ -362,11 +494,19 @@ def parse_args() -> argparse.Namespace:
     parser.set_defaults(use_wrist=None)
     parser.add_argument("--use_torch_compile", action="store_true")
     parser.add_argument("--no_use_ema", action="store_true", help="Do not replace checkpoint weights with EMA.")
+    parser.add_argument(
+        "--debug_force_history_prints",
+        type=int,
+        default=3,
+        help="Log force-history tensor details for the first N inference requests. Use 0 to disable.",
+    )
     return parser.parse_args()
 
 
 def main():
     logging.basicConfig(level=logging.INFO, force=True)
+    if torch.cuda.is_available():
+        torch.backends.cudnn.benchmark = True
     args = parse_args()
     server = FlowerInferenceServer(args)
     app = build_app(server)

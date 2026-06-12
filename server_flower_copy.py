@@ -3,6 +3,7 @@ import importlib
 import json
 import logging
 import pickle
+import time
 from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -17,7 +18,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
 from omegaconf import OmegaConf
 
-from flower.datasets.utils.episode_utils import (
+from flower_bed.Skill_flower.FLOWER_Calvin_Custom.flower.datasets.utils.episode_utils import (
     load_dataset_statistics,
     process_rgb,
     process_state,
@@ -110,7 +111,7 @@ def build_val_transforms(cfg, dataset_root: Optional[Path]) -> Dict[str, torchvi
 
 
 def apply_ema_weights(model: torch.nn.Module, checkpoint_path: Path) -> None:
-    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    checkpoint = torch.load(checkpoint_path, map_location="cpu",weights_only=False)
     ema_weights = checkpoint.get("callbacks", {}).get("EMA", {}).get("ema_weights")
     if ema_weights is None:
         LOGGER.info("No EMA weights found in %s; using checkpoint state_dict.", checkpoint_path)
@@ -158,11 +159,22 @@ def load_model(
     model_cfg["second_view_key"] = "rgb_gripper"
 
     model_class = load_class(class_name)
-    model = model_class.load_from_checkpoint(
-        str(checkpoint_path),
-        map_location=device,
-        **model_cfg,
-    )
+
+    _orig_torch_load = torch.load
+
+    def _torch_load_weights_only_false(*args, **kwargs):
+        kwargs.setdefault("weights_only", False)
+        return _orig_torch_load(*args, **kwargs)
+
+    torch.load = _torch_load_weights_only_false
+    try:
+        model = model_class.load_from_checkpoint(
+            str(checkpoint_path),
+            map_location=device,
+            **model_cfg,
+        )
+    finally:
+        torch.load = _orig_torch_load
 
     if use_ema_weights:
         apply_ema_weights(model, checkpoint_path)
@@ -279,8 +291,13 @@ class FlowerInferenceServer:
         if self.prompt_text is None:
             raise RuntimeError("Prompt is not set. Call /reset first.")
 
+        t0 = time.perf_counter()
         obs_payload = payload["observation"] if "observation" in payload else payload
         obs = self._build_observation(obs_payload)
+        if self.device.type == "cuda":
+            torch.cuda.synchronize()
+        t1 = time.perf_counter()
+
         goal = {"lang_text": self.prompt_text}
 
         autocast_context = (
@@ -292,7 +309,21 @@ class FlowerInferenceServer:
             with autocast_context:
                 action = self.model.step(obs, goal)
 
+        if self.device.type == "cuda":
+            torch.cuda.synchronize()
+        t2 = time.perf_counter()
+
         action_np = action.detach().cpu().numpy().astype(np.float32)
+        t3 = time.perf_counter()
+
+        LOGGER.info(
+            "[SERVER timing] build_obs=%.2f ms, model_step=%.2f ms, "
+            "to_numpy=%.2f ms, total=%.2f ms",
+            (t1 - t0) * 1000,
+            (t2 - t1) * 1000,
+            (t3 - t2) * 1000,
+            (t3 - t0) * 1000,
+        )
         return np.squeeze(action_np)
 
 

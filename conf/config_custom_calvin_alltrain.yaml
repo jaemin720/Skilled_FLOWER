@@ -52,6 +52,7 @@ logger:
 model:
   load_pretrained: True
   pretrained_model_path: /home/jack/flower_vla_calvin/flower_vla_pret/360000_model_weights.pt
+  lowdim_obs_dim: 11
 
 hydra:
   run:
