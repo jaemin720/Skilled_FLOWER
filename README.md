@@ -1,3 +1,27 @@
+# FLOWER Calvin Custom
+
+This repository is a modified version of the FLOWER VLA codebase, adapted for custom robot dataset training and inference.
+
+## Overview
+
+This project is based on the original FLOWER VLA repository and includes modifications for custom data preprocessing, datamodule configuration, training scripts, and inference server utilities.
+
+## Main Modifications
+
+- Added custom dataset preprocessing scripts
+- Added custom Calvin datamodule configurations
+- Modified FLOWER model and training pipeline for custom robot data
+- Added training scripts for custom dataset experiments
+- Added inference server scripts for evaluation
+
+## Original Repository
+
+This repository is adapted from:
+
+https://github.com/intuitive-robots/flower_vla_calvin
+
+Please refer to the original repository for the base FLOWER VLA implementation.
+
 # FlowerVLA
 
 [Paper](https://www.arxiv.org/pdf/2509.04996), [Project Page](https://intuitive-robots.github.io/flower_vla/), [Pretraining Code](https://github.com/intuitive-robots/flower_vla_pret)
