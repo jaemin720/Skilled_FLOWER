@@ -6,14 +6,14 @@ defaults:
   - override hydra/job_logging: colorlog
   - override hydra/hydra_logging: colorlog
 
-root_data_dir: /home/jack/flower_vla_calvin/multi_task_dataset_raw_action_alltrain_actnorm
+root_data_dir: /home/jack/flower_vla_calvin/multi_task_dataset_raw_action_alltrain
 lang_folder: lang_clip_resnet50
 
-log_dir: /data/jack/log
+log_dir: /data2/jack/log
 slurm: false
 seed: 242
 device: 'cuda'
-batch_size: 64
+batch_size: 16
 devices: 2
 act_dim: 7
 proprio_dims: 11
@@ -45,18 +45,18 @@ logger:
   save_dir: ${log_dir}
   name: jack_usb_training
   group: vla_real_data
-  project: flower_cond_skill_xyRemoved
+  project: flower_cond_skill_xyRemoved_check
   entity: hjm20720-d
   id: ???
 
 model:
   load_pretrained: True
-  pretrained_model_path: /home/jack/practice/flower_finetune/flower_vla_calvin/flower_vla_pret/360000_model_weights.pt
+  pretrained_model_path: /home/jack/flower_vla_calvin/flower_vla_pret/360000_model_weights.pt
   lowdim_obs_dim: 11
-  use_proprio_skill_history_mlp_adaln: false
+  use_proprio_skill_history_mlp_adaln: true
   use_skill_vae_adaln: true
   use_skill_vae_adaln_conv1d: false
-  skill_vae_ckpt_path: /home/jack/flower_bed/Skill_flower/FLOWER_Calvin_Custom/multitask_model_epoch_0200.pth
+  skill_vae_ckpt_path: /home/jack/multitask_model_epoch_0200.pth
   history_adaln_source: skill_vae
   skill_vae_cond_pool: mean
   skill_vae_strict_load: false
