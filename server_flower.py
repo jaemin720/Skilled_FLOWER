@@ -3,7 +3,6 @@ import importlib
 import json
 import logging
 import pickle
-import time
 from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -18,7 +17,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
 from omegaconf import OmegaConf
 
-from flower_bed.Skill_flower.FLOWER_Calvin_Custom.flower.datasets.utils.episode_utils import (
+from flower.datasets.utils.episode_utils import (
     load_dataset_statistics,
     process_rgb,
     process_state,
@@ -291,13 +290,8 @@ class FlowerInferenceServer:
         if self.prompt_text is None:
             raise RuntimeError("Prompt is not set. Call /reset first.")
 
-        t0 = time.perf_counter()
         obs_payload = payload["observation"] if "observation" in payload else payload
         obs = self._build_observation(obs_payload)
-        if self.device.type == "cuda":
-            torch.cuda.synchronize()
-        t1 = time.perf_counter()
-
         goal = {"lang_text": self.prompt_text}
 
         autocast_context = (
@@ -309,21 +303,7 @@ class FlowerInferenceServer:
             with autocast_context:
                 action = self.model.step(obs, goal)
 
-        if self.device.type == "cuda":
-            torch.cuda.synchronize()
-        t2 = time.perf_counter()
-
         action_np = action.detach().cpu().numpy().astype(np.float32)
-        t3 = time.perf_counter()
-
-        LOGGER.info(
-            "[SERVER timing] build_obs=%.2f ms, model_step=%.2f ms, "
-            "to_numpy=%.2f ms, total=%.2f ms",
-            (t1 - t0) * 1000,
-            (t2 - t1) * 1000,
-            (t3 - t2) * 1000,
-            (t3 - t0) * 1000,
-        )
         return np.squeeze(action_np)
 
 
@@ -388,7 +368,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--data_name", default=None, help="Ignored. Kept for compatibility.")
     parser.add_argument("--stats_path", default=None, help="Ignored. Kept for compatibility.")
     parser.add_argument("--host", default="0.0.0.0")
-    parser.add_argument("--port", type=int, default=45587)
+    parser.add_argument("--port", type=int, default=20)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--image_size", type=int, default=None, help="Ignored. Kept for compatibility.")
     parser.add_argument("--action_horizon", type=int, default=10)
