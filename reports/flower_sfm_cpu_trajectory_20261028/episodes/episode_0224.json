@@ -1,0 +1,17 @@
+{
+  "episode_id": 224,
+  "task": "knob",
+  "position": 3,
+  "task_demo_number": 25,
+  "frames": 264,
+  "xyz_mean_mm": 1.1123790124172355,
+  "xyz_median_mm": 0.7011496113790556,
+  "xyz_p95_mm": 3.7801693277920614,
+  "xyz_max_mm": 8.793661538104296,
+  "xyz_rmse_mm": 1.6862085302153373,
+  "orientation_mean_deg": 0.08742328875810199,
+  "orientation_p95_deg": 0.6530085054540601,
+  "orientation_max_deg": 3.178102685656868,
+  "gripper_accuracy": 0.9886363636363636,
+  "gripper_mae": 0.02227876087029775
+}

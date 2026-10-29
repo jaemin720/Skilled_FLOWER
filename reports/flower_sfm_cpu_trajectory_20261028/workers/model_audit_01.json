@@ -1,0 +1,17 @@
+{
+  "device": "cpu",
+  "dtype": "float32",
+  "state_tensors": 924,
+  "strict_load": true,
+  "weights": "ema",
+  "epoch": 20,
+  "global_step": 20820,
+  "frozen_prompt_sha256": "6eba7c803e0f424e10436b09e7fa1a92c9570fd701c3a4eff835f4f941224da0",
+  "prompt_restoration": "Original cached Florence constructor and training seed, before checkpoint load",
+  "train_seed": 42,
+  "action_horizon": 10,
+  "sampling_steps": 4,
+  "proprio_dim": 13,
+  "ft_history_length": 50,
+  "cuda_initialized": false
+}

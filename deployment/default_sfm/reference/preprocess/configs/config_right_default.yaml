@@ -1,0 +1,93 @@
+version: 1
+
+# 모든 상대 경로는 이 YAML 파일의 폴더 기준입니다.
+input:
+  path: ../../demos/[DATA 경로]
+  recursive: true
+  # null: episode에 내장된 config 우선, 없으면 데이터 경로의 env_name으로 추론.
+  # 다른 곳으로 옮긴 데이터는 수집 당시 config.json 경로를 명시하세요.
+  collection_config: null
+
+output:
+  directory: ../../demos/preprocessed/[처리된 데이터 경로]
+  overwrite: false
+  compression: lzf  # lzf / gzip / null
+  save_next_observations: true
+
+
+# source: pickle의 observations 내부 key, target: HDF5 observations 내부 key.
+# obs_horizon 축이 있으면 마지막 관측만 사용합니다. history의 샘플 축은 보존합니다.
+observations:
+  - source: state
+    target: state
+    type: state
+    # 저장 순서는 이 목록 순서. 원본 열 위치는 수집 config의 sorted(proprio_keys)로 해석.
+    keys:
+      - right/gripper_pose
+      - right/tcp_force
+      - key: right/tcp_pose
+        components: {x: true, y: true, z: true, roll: true, pitch: true, yaw: true}
+      - right/tcp_torque
+      - right/tcp_vel
+
+  - source: wrist_cam_d405_a
+    target: image_wrist_right
+    type: image
+    input_color: rgb  # 저장된 observation은 이미 RGB. BGR 자료만 bgr로 설정.
+    crop: null        # 필요하면 [top, left, height, width], resize 이전에 적용
+    resize: [224, 224] # [height, width]; null이면 원본 해상도
+    resize_mode: stretch  # stretch / letterbox (비율 유지, 검은 여백)
+    interpolation: area   # area / linear / nearest / cubic
+
+  - source: head_cam_d455
+    target: image_head
+    type: image
+    input_color: rgb
+    crop: null
+    resize: [224, 224]
+    resize_mode: stretch
+    interpolation: area
+
+  # 필요한 경우 주석 해제: frame별 원본 state history 전체를 별도 보관
+  # - source: right_state_history
+  #   target: state_history
+  #   type: array
+  #   sample_ndim: 2
+
+# 첫 observation 대비 실제 TCP 위치/자세 또는 gripper 변화로 시작 시점을 검출.
+# 이후의 중간 정지/접촉 구간, 마지막 구간은 제거하지 않습니다.
+crop_initial_stationary:
+  enabled: true
+  pose_keys: [right/tcp_pose]
+  gripper_keys: [right/gripper_pose]
+  translation_threshold_m: 0.01
+  rotation_threshold_rad: 0.01
+  gripper_threshold: 0.02
+  consecutive_frames: 3
+  pre_roll_frames: 2
+  no_motion: drop   # keep / drop / error (전 구간 정지일 때)
+
+# 원본 actions가 absolute이면 관측 pose 기준 world delta로 변환합니다.
+# 이미 delta이면 원본 값 그대로 chunk화합니다. auto는 파일의 action_format을 확인합니다.
+actions:
+  mode: relative  # delta / delta_flange / relative / relative_observed / relative_observed_residual
+  length: 50
+  source_format: auto  # auto / absolute / delta; 형식 미표기 데이터는 명시 필요
+  # Relative gripper는 원본 command 유지: interpreter의 relative_gripper_action_mode=absolute.
+  # 마지막 부족 구간은 0 padding, action_mask=false. episode 경계를 넘지 않습니다.
+
+normalization:
+  state:
+    method: standard  # none / standard / minmax / symlog / symlog_minmax
+    epsilon: 0.000001
+  action:
+    method: symlog_minmax # none / standard / minmax / symlog / symlog_minmax
+    temperature: 20.0
+    epsilon: 0.000001
+  # null: 이번 입력(훈련 데이터) 전체에서 통계 계산.
+  # 검증 데이터: 기존 훈련 출력의 normalization.json 경로를 지정해 동일 통계 사용.
+  stats_file: null
+
+# 출력: 에피소드별 HDF5 + config.yaml + normalization.json + inference_config.json + manifest.json.
+# state 통계는 retained observations만, F/T는 timestep 및 history 샘플을 합쳐 채널별 계산.
+# action 통계는 mask=true chunk 원소만 사용. 현재/다음 관측 및 inference에 같은 통계를 적용.

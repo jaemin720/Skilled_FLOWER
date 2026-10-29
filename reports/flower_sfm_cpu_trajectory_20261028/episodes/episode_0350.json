@@ -1,0 +1,17 @@
+{
+  "episode_id": 350,
+  "task": "rotary_switch",
+  "position": 1,
+  "task_demo_number": 1,
+  "frames": 220,
+  "xyz_mean_mm": 0.8585075868360809,
+  "xyz_median_mm": 0.6636337806430856,
+  "xyz_p95_mm": 2.404190924454659,
+  "xyz_max_mm": 4.7103508894306945,
+  "xyz_rmse_mm": 1.1340618052521925,
+  "orientation_mean_deg": 0.12471306883087316,
+  "orientation_p95_deg": 0.5354893099772675,
+  "orientation_max_deg": 4.877674790557992,
+  "gripper_accuracy": 0.9727272727272728,
+  "gripper_mae": 0.05575485270131718
+}

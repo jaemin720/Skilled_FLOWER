@@ -1,0 +1,63 @@
+{
+  "time_s": "Seconds from the first retained observation; recorded timestamps, no temporal interpolation",
+  "source_index": "Index in the original untrimmed demonstration",
+  "state_physical": {
+    "columns": [
+      "gripper",
+      "x",
+      "y",
+      "z",
+      "roll",
+      "pitch",
+      "yaw",
+      "vx",
+      "vy",
+      "vz",
+      "wx",
+      "wy",
+      "wz"
+    ],
+    "units": [
+      "unitless",
+      "m",
+      "m",
+      "m",
+      "rad",
+      "rad",
+      "rad",
+      "m/s",
+      "m/s",
+      "m/s",
+      "rad/s",
+      "rad/s",
+      "rad/s"
+    ]
+  },
+  "action_physical": {
+    "columns": [
+      "dx",
+      "dy",
+      "dz",
+      "rx",
+      "ry",
+      "rz",
+      "gripper"
+    ],
+    "units": [
+      "m",
+      "m",
+      "m",
+      "rad",
+      "rad",
+      "rad",
+      "-1 closed / +1 open"
+    ],
+    "translation_frame": "robot base",
+    "rotation": "target_rotation = Rotation.from_rotvec(delta) * measured_rotation"
+  },
+  "target_xyz": "meters; plots use millimeters",
+  "target_quat": "quaternion xyzw",
+  "pred_actions_normalized": "[evaluated_observations, 10, 7], native model output; action_pose inverse in normalization.json for the first six channels",
+  "plot_protocol": "Only the first action of each chunk is plotted, using recorded observations; no cumulative integration or smoothing",
+  "gripper_accuracy": "Fraction of model sign decisions (threshold 0) matching the held +/-1 target; plots and CSV retain continuous predictions"
+}

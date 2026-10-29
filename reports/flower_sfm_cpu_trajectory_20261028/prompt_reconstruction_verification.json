@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "frozen_prompt_sha256": "6eba7c803e0f424e10436b09e7fa1a92c9570fd701c3a4eff835f4f941224da0",
+  "matches_training_initialization_order": true,
+  "train_seed": 42,
+  "train_cpu_threads": 4,
+  "float32_matmul_precision": "medium",
+  "cuda_initialized": false
+}

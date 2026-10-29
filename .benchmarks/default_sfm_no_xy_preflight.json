@@ -1,0 +1,127 @@
+{
+  "passed": true,
+  "configuration_differences": {
+    "datamodule.datasets.lang_dataset.proprio_state.n_state_obs": {
+      "baseline": 13,
+      "no_xy": 11
+    },
+    "datamodule.datasets.lang_dataset.proprio_state.keep_indices": {
+      "baseline": [
+        [
+          0,
+          13
+        ]
+      ],
+      "no_xy": [
+        [
+          0,
+          1
+        ],
+        [
+          3,
+          13
+        ]
+      ]
+    },
+    "proprio_dims": {
+      "baseline": 13,
+      "no_xy": 11
+    },
+    "datamodule.proprioception_dims.n_state_obs": {
+      "baseline": 13,
+      "no_xy": 11
+    },
+    "log_dir": {
+      "baseline": "/home/jack/Skilled_FLOWER/logs/default_sfm",
+      "no_xy": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy"
+    },
+    "logger.name": {
+      "baseline": "flower_default_sfm_crop_v2",
+      "no_xy": "flower_default_sfm_crop_v2_no_xy"
+    },
+    "datamodule.proprioception_dims.keep_indices": {
+      "baseline": [
+        [
+          0,
+          13
+        ]
+      ],
+      "no_xy": [
+        [
+          0,
+          1
+        ],
+        [
+          3,
+          13
+        ]
+      ]
+    },
+    "model.lowdim_obs_dim": {
+      "baseline": 13,
+      "no_xy": 11
+    },
+    "logger.save_dir": {
+      "baseline": "/home/jack/Skilled_FLOWER/logs/default_sfm",
+      "no_xy": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy"
+    },
+    "logger.group": {
+      "baseline": "default_sfm",
+      "no_xy": "default_sfm_no_xy"
+    }
+  },
+  "retained_columns": [
+    "gripper",
+    "z",
+    "roll",
+    "pitch",
+    "yaw",
+    "vx",
+    "vy",
+    "vz",
+    "wx",
+    "wy",
+    "wz"
+  ],
+  "removed_columns": [
+    "x",
+    "y"
+  ],
+  "dataset_windows": 133189,
+  "steps_per_epoch": 1041,
+  "total_steps": 20820,
+  "sample_checks": [
+    {
+      "window_index": 0,
+      "proprio_shape": [
+        1,
+        11
+      ],
+      "images_actions_ft_language_identical": true
+    },
+    {
+      "window_index": 44396,
+      "proprio_shape": [
+        1,
+        11
+      ],
+      "images_actions_ft_language_identical": true
+    },
+    {
+      "window_index": 88792,
+      "proprio_shape": [
+        1,
+        11
+      ],
+      "images_actions_ft_language_identical": true
+    },
+    {
+      "window_index": 133188,
+      "proprio_shape": [
+        1,
+        11
+      ],
+      "images_actions_ft_language_identical": true
+    }
+  ]
+}

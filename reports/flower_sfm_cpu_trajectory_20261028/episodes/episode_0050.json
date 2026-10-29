@@ -1,0 +1,17 @@
+{
+  "episode_id": 50,
+  "task": "barlatch",
+  "position": 1,
+  "task_demo_number": 1,
+  "frames": 375,
+  "xyz_mean_mm": 0.9316187618607288,
+  "xyz_median_mm": 0.7322755149329846,
+  "xyz_p95_mm": 2.3354462856029103,
+  "xyz_max_mm": 4.984930475781743,
+  "xyz_rmse_mm": 1.1804384525151583,
+  "orientation_mean_deg": 0.1345569441333784,
+  "orientation_p95_deg": 0.7255203380644133,
+  "orientation_max_deg": 2.596177743864954,
+  "gripper_accuracy": 0.984,
+  "gripper_mae": 0.03188094854354859
+}

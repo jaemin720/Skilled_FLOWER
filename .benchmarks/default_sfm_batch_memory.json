@@ -1,0 +1,186 @@
+{
+  "gpus": "0,1",
+  "optimizer_steps": 0,
+  "cases": [
+    {
+      "per_gpu_batch_size": 32,
+      "status": "passed",
+      "ranks": [
+        {
+          "rank": 0,
+          "device": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+          "per_gpu_batch_size": 32,
+          "global_batch_size": 64,
+          "precision": "16-mixed",
+          "action_horizon": 10,
+          "training_windows": 133189,
+          "proprio_dim": 13,
+          "proprio_contains_ft": false,
+          "image_shape": [
+            224,
+            224
+          ],
+          "views": 2,
+          "additional_image_crop": false,
+          "parameters": 837210911,
+          "trainable_parameters": 837210911,
+          "total_gib": 94.96832275390625,
+          "baseline_allocated_gib": 19.142911434173584,
+          "peak_allocated_gib": 53.79163455963135,
+          "peak_reserved_gib": 54.669921875,
+          "adamw_state_gib": 6.237707369029522,
+          "ema_gib": 3.315749619156122,
+          "extra_update_workspace_gib": 3.314509507268667,
+          "forward_backward_seconds": [
+            3.640413898974657,
+            0.5183321470394731
+          ],
+          "losses": [
+            8.010540962219238,
+            9.217232704162598
+          ],
+          "finite_gradients": [
+            true,
+            true
+          ],
+          "optimizer_steps": 0,
+          "checkpoint_saved": false,
+          "full_vlm": true,
+          "all_vlm_weights_loaded_from_flower_checkpoint": true
+        },
+        {
+          "rank": 1,
+          "device": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+          "per_gpu_batch_size": 32,
+          "global_batch_size": 64,
+          "precision": "16-mixed",
+          "action_horizon": 10,
+          "training_windows": 133189,
+          "proprio_dim": 13,
+          "proprio_contains_ft": false,
+          "image_shape": [
+            224,
+            224
+          ],
+          "views": 2,
+          "additional_image_crop": false,
+          "parameters": 837210911,
+          "trainable_parameters": 837210911,
+          "total_gib": 94.96832275390625,
+          "baseline_allocated_gib": 19.142911434173584,
+          "peak_allocated_gib": 53.79163455963135,
+          "peak_reserved_gib": 54.669921875,
+          "adamw_state_gib": 6.237707369029522,
+          "ema_gib": 3.315749619156122,
+          "extra_update_workspace_gib": 3.314509507268667,
+          "forward_backward_seconds": [
+            3.6404002588242292,
+            0.5185265727341175
+          ],
+          "losses": [
+            8.17889404296875,
+            6.541434288024902
+          ],
+          "finite_gradients": [
+            true,
+            true
+          ],
+          "optimizer_steps": 0,
+          "checkpoint_saved": false,
+          "full_vlm": true,
+          "all_vlm_weights_loaded_from_flower_checkpoint": true
+        }
+      ]
+    },
+    {
+      "per_gpu_batch_size": 64,
+      "status": "passed",
+      "ranks": [
+        {
+          "rank": 0,
+          "device": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+          "per_gpu_batch_size": 64,
+          "global_batch_size": 128,
+          "precision": "16-mixed",
+          "action_horizon": 10,
+          "training_windows": 133189,
+          "proprio_dim": 13,
+          "proprio_contains_ft": false,
+          "image_shape": [
+            224,
+            224
+          ],
+          "views": 2,
+          "additional_image_crop": false,
+          "parameters": 837210911,
+          "trainable_parameters": 837210911,
+          "total_gib": 94.96832275390625,
+          "baseline_allocated_gib": 19.178849697113037,
+          "peak_allocated_gib": 87.03641986846924,
+          "peak_reserved_gib": 88.3125,
+          "adamw_state_gib": 6.237707369029522,
+          "ema_gib": 3.315749619156122,
+          "extra_update_workspace_gib": 3.314509507268667,
+          "forward_backward_seconds": [
+            4.131283680908382,
+            0.9337726579979062
+          ],
+          "losses": [
+            8.172450065612793,
+            8.521549224853516
+          ],
+          "finite_gradients": [
+            true,
+            true
+          ],
+          "optimizer_steps": 0,
+          "checkpoint_saved": false,
+          "full_vlm": true,
+          "all_vlm_weights_loaded_from_flower_checkpoint": true
+        },
+        {
+          "rank": 1,
+          "device": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+          "per_gpu_batch_size": 64,
+          "global_batch_size": 128,
+          "precision": "16-mixed",
+          "action_horizon": 10,
+          "training_windows": 133189,
+          "proprio_dim": 13,
+          "proprio_contains_ft": false,
+          "image_shape": [
+            224,
+            224
+          ],
+          "views": 2,
+          "additional_image_crop": false,
+          "parameters": 837210911,
+          "trainable_parameters": 837210911,
+          "total_gib": 94.96832275390625,
+          "baseline_allocated_gib": 19.178849697113037,
+          "peak_allocated_gib": 87.03641986846924,
+          "peak_reserved_gib": 88.3125,
+          "adamw_state_gib": 6.237707369029522,
+          "ema_gib": 3.315749619156122,
+          "extra_update_workspace_gib": 3.314509507268667,
+          "forward_backward_seconds": [
+            4.130428425036371,
+            0.9333512438461185
+          ],
+          "losses": [
+            8.781386375427246,
+            12.410761833190918
+          ],
+          "finite_gradients": [
+            true,
+            true
+          ],
+          "optimizer_steps": 0,
+          "checkpoint_saved": false,
+          "full_vlm": true,
+          "all_vlm_weights_loaded_from_flower_checkpoint": true
+        }
+      ]
+    }
+  ]
+}

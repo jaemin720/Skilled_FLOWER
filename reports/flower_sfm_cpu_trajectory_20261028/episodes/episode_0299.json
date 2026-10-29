@@ -1,0 +1,17 @@
+{
+  "episode_id": 299,
+  "task": "lan",
+  "position": 5,
+  "task_demo_number": 50,
+  "frames": 297,
+  "xyz_mean_mm": 2.278952181598818,
+  "xyz_median_mm": 0.8016947232796988,
+  "xyz_p95_mm": 9.394611415354603,
+  "xyz_max_mm": 23.494223763751656,
+  "xyz_rmse_mm": 4.093110236494564,
+  "orientation_mean_deg": 0.002861060606007321,
+  "orientation_p95_deg": 0.006940192462222435,
+  "orientation_max_deg": 0.026867195287308684,
+  "gripper_accuracy": 0.9932659932659933,
+  "gripper_mae": 0.013440785986004454
+}

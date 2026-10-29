@@ -154,13 +154,8 @@ class BaseDataset(Dataset):
         seq_dict = {**seq_state_obs, **seq_rgb_obs, **seq_depth_obs, **seq_acts, **info, **seq_lang}  # type:ignore
         seq_dict["idx"] = idx  # type:ignore
 
-        # SKILL_VAE_ADALN MOD:
-        # SkillVAE AdaLN conditioner용 action history를 최종 batch로 전달합니다.
-        # Flow Transformer target인 seq_dict["actions"]와 완전히 별도입니다.
+        # Keep optional force history and bounding boxes alongside the model inputs.
         for key in (
-            "skill_prev_actions",
-            "skill_prev_valid_mask",
-            "skill_prev_gripper_states",
             "right_force_history",
             getattr(self, "bbox_key", "bbox"),
         ):

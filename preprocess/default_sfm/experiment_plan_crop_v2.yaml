@@ -1,0 +1,327 @@
+# Preprocessing recipe with user-confirmed crops, 2026-10-28.
+# Based on experiments/default_sfm/experiment_plan.yaml; historical v1 is preserved there.
+# Use with scripts/default_sfm/preprocess.py; this is not a training launcher config.
+status: crop_ready_for_preprocessing
+training_started: false
+preprocessing_applied: false
+base_model: TurboVLA
+environment: turbovla-sfm
+dataset:
+  source_host: csilab
+  source_path: /home/csilab/share_projects/clean_share/demos/default_sfm
+  storage_path: /data/crestlux/default_sfm
+  project_link: data/default_sfm
+  excluded_folders: [test, usb_insert]  # Confirmed by the user, 2026-10-24.
+  task_count: 9
+  positions_per_task: 5
+  demos_per_position: 10
+  demo_count: 450
+  tasks: [audio_jack, barlatch, bnc, hdmi, knob, lan, outlet, rotary_switch, usb]
+  split:
+    policy: all_450_train_separate_evaluation  # Confirmed by the user, 2026-10-24.
+    training_demo_count: 450
+    held_out_demo_count: 0
+    evaluation_source: null  # Evaluation is separate; collection/rollout protocol is not yet specified.
+    evaluation_protocol: null
+  instruction_mapping:  # User-provided wording; display labels and Markdown emphasis are not model input.
+    audio_jack: Insert audio jack into audio port
+    barlatch: Grasp bar latch and rotate clockwise
+    bnc: Insert BNC connector and rotate clockwise
+    hdmi: Insert HDMI connector into HDMI port
+    knob: Grasp knob and rotate clockwise
+    lan: Insert LAN cable into Ethernet port
+    outlet: Insert adapter into outlet
+    rotary_switch: Grasp rotary switch and rotate clockwise
+    usb: Insert USB connector into USB port
+  instruction_policy:
+    language: en
+    same_text_for_all_five_positions: true
+    same_text_across_all_nine_variants: true
+    preserve_user_wording: true
+    add_task_label_or_position_suffix_to_model_input: false
+  instruction_semantics:
+    clockwise_tasks: [bnc, rotary_switch, knob, barlatch]
+    clockwise_viewpoint: front_view_of_each_operated_surface  # Confirmed by the user for all four tasks.
+    clockwise_viewpoint_status: confirmed
+  frame_selection:
+    policy: remove_initial_stationary_prefix  # User-confirmed; preserve later pauses and the final segment.
+    detection_parameters_confirmed: true  # User confirmed exact reuse of the historical preprocessing.
+    detection_config:
+      enabled: true
+      pose_keys: [right/tcp_pose]
+      gripper_keys: [right/gripper_pose]
+      translation_threshold_m: 0.01
+      rotation_threshold_rad: 0.01
+      gripper_threshold: 0.02
+      consecutive_frames: 3
+      pre_roll_frames: 2
+      no_motion: drop
+    read_only_start_index_audit: experiments/default_sfm/preprocessing_audit/initial_stationary_audit.json
+    historical_reference:
+      algorithm: csilab_crop_start
+      pose_keys: [right/tcp_pose]
+      gripper_keys: [right/gripper_pose]
+      translation_threshold_m: 0.01
+      rotation_threshold_rad: 0.01
+      gripper_threshold: 0.02
+      consecutive_frames: 3
+      pre_roll_frames: 2
+      no_motion: drop
+      audit: experiments/default_sfm/preprocessing_audit/stationary_crop_history.json
+    shared_source_indices_across_variants: true
+    detect_before_state_ablation: true
+    reconstruct_held_targets_before_trimming: true
+    fit_normalization_after_trimming: true
+force_torque:
+  sensor_hz: 500  # User-provided sampling frequency; no resampling applied.
+  observed_history_shape: [1, 50, 6]  # Initial sample, not a processed dataset contract.
+  history_samples: 50
+  direct_embedding_input: flattened_full_history  # Confirmed by the user.
+  direct_embedding_dimension: 300
+  history_window_nominal_ms: 100
+  history_order: oldest_to_newest
+  channel_order: [Fx, Fy, Fz, Tx, Ty, Tz]
+  zero_history_policy:
+    semantics: intentional_valid_input  # Confirmed by the user; not missing sensor data.
+    preserve: true
+    include_in_statistics: true
+    remove_or_impute: false
+    confirmation_source: user
+  normalization:
+    status: confirmed
+    method: standard  # User confirmed axis-wise standardization including intentional zero histories.
+    channel_statistics_count: 6
+    pool_history_samples: true
+    shared_across_variants: true
+    application_count: 1
+    std_floor: 0.01  # User explicitly selected the existing TurboVLA USB GRU floor.
+  gru_implementation: existing_turbovla_usb  # Confirmed by the user, 2026-10-24.
+  gru_hidden_size: 128
+  gru_num_layers: 1
+  gru_bidirectional: false
+  gru_pooling: last_hidden
+  gru_output_dimension: 256
+  gru_output_projection: linear_then_layer_norm
+  gru_reset_policy: zero_each_50_sample_window
+  retain_raw_ft_in_state: false  # Common to all nine conditions.
+  removed_raw_state_indices: [1, 2, 3, 10, 11, 12]
+  gru_state_fusion: separate_act_memory_token
+  adaln_target_modules: act_decoder_layer_norms  # Confirmed by the user.
+  adaln_condition_source: same_gru_output_as_memory_token
+  adaln_retain_gru_memory_token: true
+  adaln_modulation: scale_and_shift
+  adaln_initialization: zero_scale_and_shift
+  existing_turbovla_usb_gru_reference:
+    deployment_host: csilab
+    deployment_package: /home/csilab/share_projects/clean_share/team_codes/turbovla/jack_models_20261020
+    example_model: jack_faflow_delta_gru500hz
+    recorded_source_project: /home/jack/TurboVLA
+    checkpoint_recorded_complete: true
+    training_host: tako@115.145.172.56
+    implementation_source_available_locally: true
+    source_snapshot: experiments/default_sfm/preprocessing_audit/turbovla_training_source_snapshot
+    current_and_training_snapshot_sources_equal: true
+    historical_normalization: per_channel_training_mean_std_inside_model
+    historical_std_floor: 0.01
+    historical_statistics_reused: false
+state:
+  observed_raw_shape: [1, 19]
+  input_source: latest_observations_state
+  conditions:
+    - id: xy_keep
+      removed_position_components: []
+      removed_velocity_components: []
+      retained_raw_indices: [0, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 17, 18]
+      dimension_after_ft_removal: 13
+    - id: xy_remove
+      removed_position_components: [x, y]
+      removed_velocity_components: []
+      retained_raw_indices: [0, 6, 7, 8, 9, 13, 14, 15, 16, 17, 18]
+      dimension_after_ft_removal: 11
+    - id: xy_vxy_remove
+      removed_position_components: [x, y]
+      removed_velocity_components: [vx, vy]  # Confirmed; preserve vz, wx, wy, wz.
+      retained_raw_indices: [0, 6, 7, 8, 9, 15, 16, 17, 18]
+      dimension_after_ft_removal: 9
+  representation: tcp_xyz_rpy_with_gripper_and_velocity
+  normalization:
+    method: standard  # Confirmed by the user; independent statistics for each retained state component.
+    after_rpy_wrapping: true
+    fit_before_xy_ablation: true
+    slice_common_statistics_for_each_condition: true
+  rpy:
+    requested_candidate: per_axis_modulo_2pi
+    final_boundary_policy: csilab_wrap_angles_per_axis  # User requested the existing selectable option.
+    wrap_angles: [roll, yaw]  # Confirmed by the user, 2026-10-24; preserve signed pitch.
+    reference_implementation:
+      host: csilab
+      path: /home/csilab/share_projects/clean_share/preprocess/convert.py
+      function: StateDecoder.selected
+      option: wrap_angles
+      supported_axes: [roll, pitch, yaw]
+      documented_example_axes: [roll, yaw]
+      default_template_enabled: false
+      applied_to: current_and_next_state_observations_and_inference
+      order: component_selection_then_angle_wrap_then_normalization
+      changes_action_generation: false
+    pitch_policy: preserve_original_signed_angle
+    audit_report: experiments/default_sfm/preprocessing_audit/rpy/report.json
+    audited_demos: 450
+    audited_frames: 143127
+    applied: true
+action:
+  observed_raw_dimension: 7
+  observed_info_format: absolute_tcp_xyz_rpy_gripper
+  training_representation: delta  # Confirmed by the user, 2026-10-24.
+  coordinate_frame: robot_base
+  reference_pose: measured_tcp_pose_at_each_action_timestep
+  translation: target_xyz_minus_measured_xyz
+  rotation: rotvec_target_rotation_times_measured_rotation_inverse
+  units: [m, m, m, rad, rad, rad, gripper_command]
+  divide_by_control_period: false
+  state_angle_wrapping_changes_action_generation: false
+  chunk_length: 5  # Confirmed by the user.
+  observed_control_period_s: 0.1
+  nominal_chunk_coverage_s: 0.5
+  execution_horizon: null
+  gripper_label_rule: held_command_target  # Confirmed by the user.
+  gripper_target_source: infos.command_receipts.right.gripper_target_percent
+  gripper_closed_label: -1
+  gripper_open_label: 1
+  gripper_zero_command_behavior: retain_last_command_target
+  gripper_initial_target: open  # All 450 demos start with observed gripper opening 1.0.
+  normalization:
+    method: symlog_minmax  # User selected the verified USB recipe, with newly fitted SFM statistics.
+    temperature: 20.0
+    epsilon: 1.0e-6
+    gripper: preserve_held_minus_one_plus_one
+    reference: experiments/default_sfm/preprocessing_audit/turbovla_training_source_snapshot/runs/jack/faflow_delta_gru500hz/data_contract.json
+common_normalization:
+  fit_scope: retained_frames_from_all_450_training_demos
+  shared_across_all_nine_variants: true
+  reuse_historical_usb_statistics: false
+  fitted: false  # Fitted again when this recipe produces its dataset.
+vision:
+  observed_views: [head_cam_d455, wrist_cam_d405_a]
+  observed_shape_per_view: [1, 480, 640, 3]
+  processing_order: crop_native_original_then_resize
+  legacy_usb_crop_reference_tlhw:
+    head_cam_d455: [96, 128, 288, 384]
+    wrist_cam_d405_a: [72, 122, 336, 448]
+  crop_boxes_confirmed: true  # User-selected native-image coordinates, 2026-10-28.
+  crop_selection_notebook: notebooks/default_sfm_crop.ipynb
+  crop_tlhw:  # [top, left, height, width]; used by preprocess_image().
+    head_cam_d455: [110, 128, 254, 292]  # XYXY: (128, 110, 420, 364)
+    wrist_cam_d405_a: [110, 220, 245, 260]  # XYXY: (220, 110, 480, 355)
+  crop_layout_by_camera:
+    head_cam_d455:
+      content_hw: [195, 224]
+      padding_tblr: [14, 15, 0, 0]
+    wrist_cam_d405_a:
+      content_hw: [211, 224]
+      padding_tblr: [6, 7, 0, 0]
+  final_image_size: [224, 224]  # Confirmed by the user, 2026-10-24.
+  existing_turbovla_libero_training_image_size: [256, 256]  # Benchmark path, not USB training.
+  existing_turbovla_usb_bundle_image_size: [224, 224]  # Verified csilab deployment bundles for trained USB models.
+  existing_turbovla_usb_training_image_size: [224, 224]  # Verified saved model/data configs for 10 completed runs.
+  legacy_faflow_usb_image_size: [224, 224]
+  resize_mode: letterbox
+  interpolation: area
+  pad_value: 0
+  legacy_crop_content_size_hw: [168, 224]  # Recompute if crop aspect ratio changes.
+  legacy_crop_padding_tblr: [28, 28, 0, 0]
+  augmentation:
+    stage: training_only_after_loading_cropped_hdf5
+    color_jitter: {brightness: 0.2, contrast: 0.2, saturation: 0.2, hue: 0.02}
+    share_transform_between_current_views: true
+    preserve_black_padding: true
+initialization:
+  available_vision_backbone: pretrained/backbones/dinov3-vitb16
+  available_text_backbone: pretrained/backbones/bert-base-uncased
+  policy_checkpoint: null
+  freeze_train_policy:
+    vision_backbone: pretrained_and_trainable
+    text_backbone: pretrained_frozen_eval
+    other_modules: newly_initialized_trainable
+    common_parameter_initialization: shared_seeded_streams_across_nine_variants
+variants:
+  - id: ft_state_xy_keep
+    ft_method: state_embedding
+    remove_state_xy: false
+  - id: ft_state_xy_remove
+    ft_method: state_embedding
+    remove_state_xy: true
+  - id: ft_state_xy_vxy_remove
+    ft_method: state_embedding
+    remove_state_xy: true
+    remove_linear_velocity_xy: true
+  - id: ft_gru_xy_keep
+    ft_method: gru_embedding
+    remove_state_xy: false
+  - id: ft_gru_xy_remove
+    ft_method: gru_embedding
+    remove_state_xy: true
+  - id: ft_gru_xy_vxy_remove
+    ft_method: gru_embedding
+    remove_state_xy: true
+    remove_linear_velocity_xy: true
+  - id: ft_gru_adaln_xy_keep
+    ft_method: gru_embedding_adaln
+    remove_state_xy: false
+  - id: ft_gru_adaln_xy_remove
+    ft_method: gru_embedding_adaln
+    remove_state_xy: true
+  - id: ft_gru_adaln_xy_vxy_remove
+    ft_method: gru_embedding_adaln
+    remove_state_xy: true
+    remove_linear_velocity_xy: true
+logging:
+  future_training_wandb_mode: online
+  setup_created_wandb_run: true
+  setup_validation_run_id: uepajclc
+  setup_validation_record: experiments/default_sfm/training_validation/wandb_online_check/result.json
+  uploads: [training_configuration, environment, loss, speed, memory, progress]
+  upload_raw_demos_images_or_weights: false
+
+training:
+  config_directory: experiments/default_sfm/training_configs
+  guide: experiments/default_sfm/TRAINING_GUIDE.md
+  validation_record: experiments/default_sfm/training_validation/readiness.json
+  seed: 42
+  sampling: uniform_task_then_uniform_frame_with_replacement
+  task_probability: 0.1111111111111111
+  max_samples_per_experiment: 11118800
+  equivalent_dataset_passes: 80
+  optimizer_steps_per_experiment: 173732
+  final_batch_size: 16  # Remainder of the fixed sample budget; all other batches are 64.
+  batch_size: 64
+  microbatch_size: 64  # User confirmed matching USB exactly; no gradient accumulation.
+  gradient_accumulation_steps: 1
+  gpu_indices: [0, 1, 2]
+  experiments_per_gpu: 1
+  maximum_concurrent_experiments: 3
+  scheduling: start_next_waiting_experiment_when_gpu_slot_finishes
+  optimizer: AdamW
+  policy_learning_rate: 5.0e-5
+  vision_backbone_learning_rate: 1.0e-5
+  betas: [0.9, 0.95]
+  weight_decay: 1.0e-6
+  epsilon: 1.0e-8
+  gradient_clip_norm: 1.0
+  precision: bf16_amp
+  loss: masked_l1
+  warmup_samples: 8000
+  minimum_learning_rate_ratio: 0.01
+  ema_decay: 0.999
+  ema_reference_batch: 64
+  log_interval_steps: 10
+  save_interval_steps: 1000
+  keep_checkpoints: 2
+  formal_training_started: true
+
+# Completion record; the immutable execution-time plan is in the output bundle.
+processed_output:
+  storage_path: /data/crestlux/default_sfm_processed/sfm_delta_h5_ftstd001_v1
+  project_link: data/default_sfm_preprocessed
+  execution_record: experiments/default_sfm/preprocessing_audit/preprocessing_execution.json
+  verification_record: experiments/default_sfm/preprocessing_audit/processed_verification.json

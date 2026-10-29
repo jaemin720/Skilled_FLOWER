@@ -1,0 +1,64 @@
+{
+  "prepared_at_utc": "2026-10-28T06:40:23.066981+00:00",
+  "inference_host": "current FLOWER server",
+  "robot_host": "Kingston",
+  "server_script": "/home/jack/Skilled_FLOWER/server_flower_rpc.py",
+  "server_launcher": "/home/jack/Skilled_FLOWER/deployment/default_sfm/run_server.sh",
+  "client_deployment": "/home/csilab/share_projects/clean_share/team_codes/flower_default_sfm_rpc_20261028",
+  "local_bundle": "/home/jack/Skilled_FLOWER/datasets/default_sfm_crop_v2/rpc_bundle",
+  "bundle_id": "07c86390e0d1caacc8f9d0d15b14de5359c101eb1b46017fc29494da99eefd9a",
+  "default_checkpoint": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt",
+  "checkpoint_bytes": 13413824580,
+  "checkpoint_mtime_ns": 1793152438041192781,
+  "training_config": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/.hydra/config.yaml",
+  "training_config_sha256": "b3b23a5ef7b16c5b84339ed2fef2d137b689ebf04f7bd26f21e11e0165307696",
+  "weights": "ema",
+  "trained_action_horizon": 10,
+  "request_steps": 5,
+  "proprio_dim": 13,
+  "force_history_shape": [
+    50,
+    6
+  ],
+  "default_server_ip_from_user_example": "115.145.172.57",
+  "port": 45587,
+  "local_adapter_tests": {
+    "passed": 6,
+    "command": "CUDA_VISIBLE_DEVICES= OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 /home/jack/miniforge3/envs/flower/bin/python -m pytest -q tests/test_flower_rpc.py"
+  },
+  "client_bundle_check": {
+    "passed": true,
+    "bundle_id": "07c86390e0d1caacc8f9d0d15b14de5359c101eb1b46017fc29494da99eefd9a",
+    "observations_tested": 3,
+    "observation_max_abs_error": {
+      "robot_obs": 0,
+      "right_force_history": 0,
+      "rgb_static": 0,
+      "rgb_gripper": 0
+    },
+    "action_horizon_tested": 10,
+    "gripper_labels_unchanged": true,
+    "source_files_unchanged": 25,
+    "client_sha256": "386a8409b5339a1092e49e37d24e6a055f97c420e1d8c5ce7532cb83edaf200a",
+    "model_loaded": false,
+    "gpu_used": false,
+    "robot_started": false,
+    "http_server_started": false,
+    "scope": "Synthetic preprocessing and wire format only; no model or hardware execution"
+  },
+  "runtime_validation": {
+    "checkpoint_loaded": false,
+    "gpu_used": false,
+    "inference_server_started": false,
+    "robot_client_started": false,
+    "latency_measured": false
+  },
+  "prepared_file_sha256": {
+    "server_flower_rpc.py": "9b2847a87775205c5564003f6bc355964d63ce95a4f15bc308755f27e957d431",
+    "deployment/default_sfm/run_server.sh": "fc1592a628787a8b52b39d4c68503787c0a51311d584e64c08ea4c555478927b",
+    "deployment/default_sfm/run_client.sh": "7e31b70bf781715e3ada2e6e595a504f56d58fc22f352660c07dd696bbc58d2b",
+    "deployment/default_sfm/verify_client_bundle.py": "2e56d96adb056bded509352ca6413b00bd8b091d1d97d3b8d90fc0aa036e2a6c",
+    "scripts/build_default_sfm_rpc_bundle.py": "82a8390f818bb047ce2d5b15e65c730f1ef104f5493c58fc29b7a6dd6aa17180",
+    "scripts/build_default_sfm_rpc_fixture.py": "fd1154a06c37aa3403287a5d349b4b257509d80039af020e312b72e992b81669"
+  }
+}

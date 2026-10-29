@@ -1,0 +1,272 @@
+{
+  "created_at": "2026-10-28T12:03:39.461654+00:00",
+  "mode": "model",
+  "live_policy_modified": false,
+  "audit": {
+    "checkpoint": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt",
+    "training_config": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/.hydra/config.yaml",
+    "epoch": 20,
+    "global_step": 20820,
+    "weights": "ema",
+    "strict_load": true,
+    "frozen_prompt_sha256": "6eba7c803e0f424e10436b09e7fa1a92c9570fd701c3a4eff835f4f941224da0",
+    "train_seed": 42,
+    "action_horizon": 10,
+    "proprio_dim": 13,
+    "ft_history_length": 50,
+    "device": "cuda",
+    "precision": "float16",
+    "parameter_dtype": "float32",
+    "training_config_sha256": "b3b23a5ef7b16c5b84339ed2fef2d137b689ebf04f7bd26f21e11e0165307696",
+    "bundle_id": "07c86390e0d1caacc8f9d0d15b14de5359c101eb1b46017fc29494da99eefd9a"
+  },
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+  "cuda_visible_devices": "0",
+  "torch_version": "2.8.0+cu128",
+  "sampling_steps": 4,
+  "input": "synthetic RGB 224x224 x2; zero normalized state and force",
+  "stages": {
+    "cpu_preprocess": {
+      "cuda_stream_ms": {
+        "n": 12,
+        "median_ms": 1.1182239651679993,
+        "mean_ms": 1.1394559840361278,
+        "min_ms": 1.0693119764328003,
+        "max_ms": 1.280351996421814,
+        "p90_ms": 1.2303040027618408
+      },
+      "host_call_ms": {
+        "n": 12,
+        "median_ms": 1.1408966965973377,
+        "mean_ms": 1.1664878111332655,
+        "min_ms": 1.0931668803095818,
+        "max_ms": 1.317010261118412,
+        "p90_ms": 1.2623490765690804
+      }
+    },
+    "force_history": {
+      "cuda_stream_ms": {
+        "n": 12,
+        "median_ms": 0.527215987443924,
+        "mean_ms": 0.5305573294560114,
+        "min_ms": 0.4917759895324707,
+        "max_ms": 0.5794559717178345,
+        "p90_ms": 0.5715839862823486
+      },
+      "host_call_ms": {
+        "n": 12,
+        "median_ms": 0.538333784788847,
+        "mean_ms": 0.5416924444337686,
+        "min_ms": 0.5025072023272514,
+        "max_ms": 0.5910089239478111,
+        "p90_ms": 0.5835089832544327
+      }
+    },
+    "vision_each_view": {
+      "cuda_stream_ms": {
+        "n": 24,
+        "median_ms": 12.923408031463623,
+        "mean_ms": 12.929035941759745,
+        "min_ms": 12.275424003601074,
+        "max_ms": 13.73804759979248,
+        "p90_ms": 13.461983680725098
+      },
+      "host_call_ms": {
+        "n": 24,
+        "median_ms": 12.939437758177519,
+        "mean_ms": 12.945736253944537,
+        "min_ms": 12.292448431253433,
+        "max_ms": 13.754751533269882,
+        "p90_ms": 13.479187153279781
+      }
+    },
+    "text_embeddings": {
+      "cuda_stream_ms": {
+        "n": 12,
+        "median_ms": 0.43267200887203217,
+        "mean_ms": 0.42705333481232327,
+        "min_ms": 0.34409600496292114,
+        "max_ms": 0.4697920083999634,
+        "p90_ms": 0.46851199865341187
+      },
+      "host_call_ms": {
+        "n": 12,
+        "median_ms": 0.4481319338083267,
+        "mean_ms": 0.4421175302316745,
+        "min_ms": 0.3585861995816231,
+        "max_ms": 0.484587624669075,
+        "p90_ms": 0.48406701534986496
+      }
+    },
+    "vlm_encoder": {
+      "cuda_stream_ms": {
+        "n": 12,
+        "median_ms": 4.226399898529053,
+        "mean_ms": 4.250655968983968,
+        "min_ms": 4.131584167480469,
+        "max_ms": 4.482111930847168,
+        "p90_ms": 4.330783843994141
+      },
+      "host_call_ms": {
+        "n": 12,
+        "median_ms": 4.240074660629034,
+        "mean_ms": 4.266330118601521,
+        "min_ms": 4.1629234328866005,
+        "max_ms": 4.496647976338863,
+        "p90_ms": 4.344506189227104
+      }
+    },
+    "encode_total": {
+      "cuda_stream_ms": {
+        "n": 12,
+        "median_ms": 31.64256000518799,
+        "mean_ms": 31.774402777353924,
+        "min_ms": 30.83513641357422,
+        "max_ms": 33.16672134399414,
+        "p90_ms": 32.62684631347656
+      },
+      "host_call_ms": {
+        "n": 12,
+        "median_ms": 31.655875965952873,
+        "mean_ms": 31.787042583649356,
+        "min_ms": 30.84749262779951,
+        "max_ms": 33.179509453475475,
+        "p90_ms": 32.640499994158745
+      }
+    },
+    "dit_each_step": {
+      "cuda_stream_ms": {
+        "n": 48,
+        "median_ms": 14.456207752227783,
+        "mean_ms": 14.450671335061392,
+        "min_ms": 13.912511825561523,
+        "max_ms": 15.70473575592041,
+        "p90_ms": 14.954976081848145
+      },
+      "host_call_ms": {
+        "n": 48,
+        "median_ms": 14.470946043729782,
+        "mean_ms": 14.46542718137304,
+        "min_ms": 13.92714399844408,
+        "max_ms": 15.71860071271658,
+        "p90_ms": 14.968948438763618
+      }
+    },
+    "sample_total": {
+      "cuda_stream_ms": {
+        "n": 12,
+        "median_ms": 57.776832580566406,
+        "mean_ms": 58.083231608072914,
+        "min_ms": 56.47334289550781,
+        "max_ms": 60.58176040649414,
+        "p90_ms": 59.65846252441406
+      },
+      "host_call_ms": {
+        "n": 12,
+        "median_ms": 57.79006192460656,
+        "mean_ms": 58.09663406883677,
+        "min_ms": 56.48668576031923,
+        "max_ms": 60.59581879526377,
+        "p90_ms": 59.672354720532894
+      }
+    }
+  },
+  "warmup": 5,
+  "original_full_predict": {
+    "n": 12,
+    "median_ms": 92.79688727110624,
+    "mean_ms": 92.91825792752206,
+    "min_ms": 92.03150402754545,
+    "max_ms": 94.50674150139093,
+    "p90_ms": 93.74960232526064
+  },
+  "profiler_cuda_table": "-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  \n                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  \n-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  \n                                            aten::copy_         7.01%      27.764ms        15.56%      61.642ms       6.704us      28.681ms        32.64%      28.682ms       3.119us          9195  \nvoid at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us      21.599ms        24.58%      21.599ms       3.350us          6447  \n                                            aten::addmm         4.55%      18.006ms         6.17%      24.433ms      22.192us      20.388ms        23.20%      20.388ms      18.518us          1101  \nvoid cutlass::Kernel2<cutlass_80_tensorop_f16_s16816...         0.00%       0.000us         0.00%       0.000us       0.000us       8.404ms         9.56%       8.404ms      37.858us           222  \n                                              aten::mul         4.54%      17.981ms         8.00%      31.689ms       7.705us       8.378ms         9.53%       8.378ms       2.037us          4113  \n                                               aten::mm         5.03%      19.925ms         6.44%      25.499ms      18.240us       7.695ms         8.76%       7.695ms       5.504us          1398  \nvoid cutlass::Kernel2<cutlass_80_wmma_tensorop_f16_s...         0.00%       0.000us         0.00%       0.000us       0.000us       4.712ms         5.36%       4.712ms       4.619us          1020  \n                                              aten::add         3.09%      12.235ms         5.55%      21.966ms       7.548us       4.462ms         5.08%       4.462ms       1.533us          2910  \nvoid cutlass::Kernel2<cutlass_80_tensorop_f16_s16816...         0.00%       0.000us         0.00%       0.000us       0.000us       3.518ms         4.00%       3.518ms      24.433us           144  \nvoid at::native::elementwise_kernel<128, 4, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us       3.516ms         4.00%       3.516ms       3.021us          1164  \nvoid at::native::elementwise_kernel<128, 2, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us       3.137ms         3.57%       3.137ms       1.527us          2055  \nvoid cutlass::Kernel2<cutlass_80_wmma_tensorop_f16_s...         0.00%       0.000us         0.00%       0.000us       0.000us       3.101ms         3.53%       3.101ms      20.674us           150  \nvoid at::native::elementwise_kernel<128, 4, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us       3.070ms         3.49%       3.070ms       3.045us          1008  \nvoid at::native::unrolled_elementwise_kernel<at::nat...         0.00%       0.000us         0.00%       0.000us       0.000us       2.601ms         2.96%       2.601ms       2.513us          1035  \n                                             aten::mean         1.78%       7.041ms         2.73%      10.795ms       9.995us       2.400ms         2.73%       2.402ms       2.224us          1080  \nvoid at::native::elementwise_kernel<128, 4, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us       2.388ms         2.72%       2.388ms       2.519us           948  \nvoid at::native::reduce_kernel<512, 1, at::native::R...         0.00%       0.000us         0.00%       0.000us       0.000us       2.323ms         2.64%       2.323ms       2.199us          1056  \nvoid cutlass::Kernel2<cutlass_80_wmma_tensorop_f16_s...         0.00%       0.000us         0.00%       0.000us       0.000us       2.302ms         2.62%       2.302ms       7.238us           318  \n                                             aten::add_         1.87%       7.398ms         3.01%      11.936ms       8.502us       1.983ms         2.26%       1.983ms       1.412us          1404  \nvoid cutlass::Kernel2<cutlass_80_tensorop_f16_s16816...         0.00%       0.000us         0.00%       0.000us       0.000us       1.714ms         1.95%       1.714ms      21.972us            78  \n                                aten::native_layer_norm         0.76%       3.021ms         1.81%       7.178ms      18.127us       1.710ms         1.95%       1.765ms       4.457us           396  \nvoid at::native::(anonymous namespace)::vectorized_l...         0.00%       0.000us         0.00%       0.000us       0.000us       1.710ms         1.95%       1.710ms       4.319us           396  \nvoid at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us       1.667ms         1.90%       1.667ms       1.068us          1560  \n                         aten::_flash_attention_forward         0.39%       1.562ms         1.12%       4.452ms      24.734us       1.553ms         1.77%       1.553ms       8.629us           180  \nvoid pytorch_flash::flash_fwd_kernel<Flash_fwd_kerne...         0.00%       0.000us         0.00%       0.000us       0.000us       1.553ms         1.77%       1.553ms       8.629us           180  \n-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  \nSelf CPU time total: 396.093ms\nSelf CUDA time total: 87.883ms\n",
+  "profiler_cpu_table": "-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  \n                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  \n-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  \n                                       cudaLaunchKernel        21.85%      86.535ms        21.90%      86.755ms       3.439us       0.000us         0.00%       0.000us       0.000us         25224  \n                                            aten::copy_         7.01%      27.764ms        15.56%      61.642ms       6.704us      28.681ms        32.64%      28.682ms       3.119us          9195  \n                                               aten::mm         5.03%      19.925ms         6.44%      25.499ms      18.240us       7.695ms         8.76%       7.695ms       5.504us          1398  \n                                    aten::empty_strided         4.73%      18.750ms         4.73%      18.750ms       2.325us       0.000us         0.00%       0.000us       0.000us          8064  \n                                            aten::addmm         4.55%      18.006ms         6.17%      24.433ms      22.192us      20.388ms        23.20%      20.388ms      18.518us          1101  \n                                              aten::mul         4.54%      17.981ms         8.00%      31.689ms       7.705us       8.378ms         9.53%       8.378ms       2.037us          4113  \n                                         aten::_to_copy         3.89%      15.400ms        21.57%      85.444ms      10.867us       0.000us         0.00%      25.072ms       3.189us          7863  \n                                           aten::linear         3.29%      13.040ms        48.96%     193.933ms      38.895us       0.000us         0.00%      75.085ms      15.059us          4986  \n                                              aten::add         3.09%      12.235ms         5.55%      21.966ms       7.548us       4.462ms         5.08%       4.462ms       1.533us          2910  \n                                            aten::empty         2.42%       9.597ms         2.42%       9.597ms       2.044us       0.000us         0.00%       0.000us       0.000us          4695  \n                                         cuLaunchKernel         2.34%       9.277ms         2.34%       9.277ms       3.409us       0.000us         0.00%       0.000us       0.000us          2721  \n                                         aten::rms_norm         2.23%       8.818ms        21.49%      85.116ms      83.447us       0.000us         0.00%      12.364ms      12.122us          1020  \n                                             aten::add_         1.87%       7.398ms         3.01%      11.936ms       8.502us       1.983ms         2.26%       1.983ms       1.412us          1404  \n                                             aten::mean         1.78%       7.041ms         2.73%      10.795ms       9.995us       2.400ms         2.73%       2.402ms       2.224us          1080  \n                                              aten::pow         1.69%       6.682ms         2.61%      10.350ms      10.147us       1.093ms         1.24%       1.093ms       1.072us          1020  \n                                           aten::matmul         1.58%       6.248ms        12.78%      50.637ms      27.580us       0.000us         0.00%      10.904ms       5.939us          1836  \n                                        aten::transpose         1.52%       6.019ms         2.09%       8.266ms       1.573us       0.000us         0.00%       0.000us       0.000us          5256  \n                                               aten::to         1.52%       6.002ms        23.09%      91.446ms       9.779us       0.000us         0.00%      25.072ms       2.681us          9351  \n                                       aten::as_strided         1.34%       5.293ms         1.34%       5.293ms       0.425us       0.000us         0.00%       0.000us       0.000us         12453  \n                                          aten::reshape         1.27%       5.021ms         2.66%      10.521ms       2.295us       0.000us         0.00%       1.058ms       0.231us          4584  \n                                aten::cudnn_convolution         1.17%       4.632ms         1.56%       6.182ms      19.814us       1.178ms         1.34%       1.599ms       5.125us           312  \n                                            aten::rsqrt         1.15%       4.563ms         1.95%       7.730ms       7.578us       1.141ms         1.30%       1.141ms       1.119us          1020  \n                     aten::scaled_dot_product_attention         1.04%       4.123ms        10.45%      41.384ms      88.427us       0.000us         0.00%       4.668ms       9.975us           468  \n                                              aten::bmm         1.03%       4.080ms         1.31%       5.178ms      17.981us       1.277ms         1.45%       1.277ms       4.434us           288  \n                                             aten::view         0.77%       3.035ms         0.77%       3.035ms       0.435us       0.000us         0.00%       0.000us       0.000us          6975  \n-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  \nSelf CPU time total: 396.093ms\nSelf CUDA time total: 87.883ms\n",
+  "cuda_sync_events": [
+    {
+      "key": "aten::item",
+      "count": 153,
+      "self_cpu_us": 153.99299999945015,
+      "cpu_us": 1837.9469999995754
+    },
+    {
+      "key": "aten::_local_scalar_dense",
+      "count": 153,
+      "self_cpu_us": 472.66400000010253,
+      "cpu_us": 1683.9540000001252
+    },
+    {
+      "key": "cudaMemcpyAsync",
+      "count": 366,
+      "self_cpu_us": 2512.5309999996916,
+      "cpu_us": 2512.5309999996916
+    },
+    {
+      "key": "Memcpy HtoD (Pageable -> Device)",
+      "count": 48,
+      "self_cpu_us": 0,
+      "cpu_us": 0
+    },
+    {
+      "key": "cudaStreamSynchronize",
+      "count": 222,
+      "self_cpu_us": 1233.7760000002017,
+      "cpu_us": 1233.7760000002017
+    },
+    {
+      "key": "void (anonymous namespace)::elementwise_kernel_with_index<int, at::native::arange_cuda_out(c10::Scalar const&, c10::Scalar const&, c10::Scalar const&, at::Tensor&)::{lambda()#1}::operator()() const::{lambda()#4}::operator()() const::{lambda(long)#1}>(int, at::native::arange_cuda_out(c10::Scalar const&, c10::Scalar const&, c10::Scalar const&, at::Tensor&)::{lambda()#1}::operator()() const::{lambda()#4}::operator()() const::{lambda(long)#1}, function_traits<at::native::arange_cuda_out(c10::Scalar const&, c10::Scalar const&, c10::Scalar const&, at::Tensor&)::{lambda()#1}::operator()() const::{lambda()#4}::operator()() const::{lambda(long)#1}>::result_type*)",
+      "count": 159,
+      "self_cpu_us": 0,
+      "cpu_us": 0
+    },
+    {
+      "key": "Memcpy DtoH (Device -> Pinned)",
+      "count": 171,
+      "self_cpu_us": 0,
+      "cpu_us": 0
+    },
+    {
+      "key": "void (anonymous namespace)::elementwise_kernel_with_index<int, at::native::arange_cuda_out(c10::Scalar const&, c10::Scalar const&, c10::Scalar const&, at::Tensor&)::{lambda()#1}::operator()() const::{lambda()#7}::operator()() const::{lambda(long)#1}>(int, at::native::arange_cuda_out(c10::Scalar const&, c10::Scalar const&, c10::Scalar const&, at::Tensor&)::{lambda()#1}::operator()() const::{lambda()#7}::operator()() const::{lambda(long)#1}, function_traits<at::native::arange_cuda_out(c10::Scalar const&, c10::Scalar const&, c10::Scalar const&, at::Tensor&)::{lambda()#1}::operator()() const::{lambda()#7}::operator()() const::{lambda(long)#1}>::result_type*)",
+      "count": 3,
+      "self_cpu_us": 0,
+      "cpu_us": 0
+    },
+    {
+      "key": "Memcpy DtoD (Device -> Device)",
+      "count": 144,
+      "self_cpu_us": 0,
+      "cpu_us": 0
+    },
+    {
+      "key": "void at::native::vectorized_elementwise_kernel<4, at::native::(anonymous namespace)::pow_tensor_scalar_kernel_impl<float, float>(at::TensorIteratorBase&, float)::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::(anonymous namespace)::pow_tensor_scalar_kernel_impl<float, float>(at::TensorIteratorBase&, float)::{lambda(float)#1}, std::array<char*, 2ul>)",
+      "count": 1020,
+      "self_cpu_us": 0,
+      "cpu_us": 0
+    },
+    {
+      "key": "aten::scalar_tensor",
+      "count": 288,
+      "self_cpu_us": 481.3469999990775,
+      "cpu_us": 2637.9069999999338
+    },
+    {
+      "key": "void at::native::vectorized_elementwise_kernel<4, at::native::(anonymous namespace)::launch_clamp_scalar(at::TensorIteratorBase&, c10::Scalar, c10::Scalar, at::native::detail::ClampLimits)::{lambda()#1}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::(anonymous namespace)::launch_clamp_scalar(at::TensorIteratorBase&, c10::Scalar, c10::Scalar, at::native::detail::ClampLimits)::{lambda()#1}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+      "count": 3,
+      "self_cpu_us": 0,
+      "cpu_us": 0
+    },
+    {
+      "key": "Memcpy DtoH (Device -> Pageable)",
+      "count": 3,
+      "self_cpu_us": 0,
+      "cpu_us": 0
+    },
+    {
+      "key": "cudaDeviceSynchronize",
+      "count": 1,
+      "self_cpu_us": 7.830000000016298,
+      "cpu_us": 7.830000000016298
+    }
+  ],
+  "peak_gpu_memory_mib": 3314.119140625
+}

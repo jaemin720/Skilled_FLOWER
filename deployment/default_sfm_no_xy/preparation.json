@@ -1,0 +1,36 @@
+{
+  "prepared_at": "2026-10-29T04:47:46.441423+00:00",
+  "checkpoint": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy/resumes/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/saved_models/epoch039.ckpt",
+  "checkpoint_bytes": 13413770820,
+  "training_config": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy/resumes/flower_sfm_no_xy_b64_e40_resume_20261028_215541/.hydra/config.yaml",
+  "completed_epochs": 40,
+  "global_step": 41640,
+  "weights": "ema",
+  "proprio_dim": 11,
+  "state_indices": [
+    0,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "action_horizon": 10,
+  "ft_history_shape": [
+    50,
+    6
+  ],
+  "server_port": 45588,
+  "server_ip": "10.206.178.31",
+  "request_steps": 5,
+  "bundle_id": "07c86390e0d1caacc8f9d0d15b14de5359c101eb1b46017fc29494da99eefd9a",
+  "kingston_dir": "/home/csilab/share_projects/clean_share/team_codes/flower_default_sfm_no_xy_rpc_20261029",
+  "model_instantiated": false,
+  "inference_started": false,
+  "robot_started": false
+}

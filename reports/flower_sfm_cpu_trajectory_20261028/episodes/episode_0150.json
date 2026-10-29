@@ -1,0 +1,17 @@
+{
+  "episode_id": 150,
+  "task": "hdmi",
+  "position": 1,
+  "task_demo_number": 1,
+  "frames": 293,
+  "xyz_mean_mm": 1.0255728058270912,
+  "xyz_median_mm": 0.7235808830969109,
+  "xyz_p95_mm": 2.8061072601355557,
+  "xyz_max_mm": 5.920730467270498,
+  "xyz_rmse_mm": 1.3410554343157635,
+  "orientation_mean_deg": 0.0032904857629044043,
+  "orientation_p95_deg": 0.008678280550562814,
+  "orientation_max_deg": 0.029081182336496484,
+  "gripper_accuracy": 0.9931740614334471,
+  "gripper_mae": 0.013878181322442793
+}

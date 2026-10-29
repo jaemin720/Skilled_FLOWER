@@ -1,0 +1,18 @@
+{
+  "created_at": "2026-10-28T13:51:13.075864+09:00",
+  "output": "/home/jack/Skilled_FLOWER/reports/flower_sfm_cpu_trajectory_20261028",
+  "run_dir": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405",
+  "checkpoint": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt",
+  "reference_pdf": "/home/jack/turbovla_faflow_delta_relative_comparison_raw.pdf",
+  "device": "cpu",
+  "dtype": "float32",
+  "workers": 9,
+  "threads_per_worker": 4,
+  "batch_size_per_worker": 8,
+  "demos_per_task": 3,
+  "total_episodes": 27,
+  "training_window_starts": 8023,
+  "weights": "ema",
+  "sampling_steps": 4,
+  "noise_seed": 20261028
+}

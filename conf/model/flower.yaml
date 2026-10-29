@@ -16,13 +16,9 @@ lowdim_obs_dim: 11
 action_dim: 7
 act_window_size: ${act_seq_len}
 
-# SkillVAE AdaLN Conditioning
-use_skill_vae_adaln: true
-use_skill_vae_adaln_conv1d: false
-
 # pretraining stuff
 load_pretrained: true
-pretrained_model_path: /home/jack/flower_vla_calvin/flower_vla_pret/360000_model_weights.pt
+pretrained_model_path: /home/jack/Skilled_FLOWER/flower_vla_pret/360000_model_weights.pt
 
 # Model flags
 use_second_view: True
@@ -30,11 +26,19 @@ second_view_key: image_wrist
 action_type_adaln: True
 use_causal_attention: true
 use_cross_attn: True
-use_adaln_cond: false
+use_adaln_cond: false  # VLM pooling into AdaLN; F/T conditioning is independent.
 use_readout_token: false
 use_proprio: True
-round_robin_conditioning: false
 return_act_chunk: false
+
+# Optional F/T conditioning. The SFM config enables this GRU -> DiT AdaLN path.
+use_force_history_adaln: false
+force_history_encoder_type: gru
+force_history_dim: 6
+force_history_hidden_dim: 128
+force_history_gru_layers: 1
+force_history_dropout: 0.0
+force_history_length: null
 
 # DiT Configuration
 sampling_type: uniform

@@ -1,0 +1,17 @@
+{
+  "episode_id": 324,
+  "task": "outlet",
+  "position": 3,
+  "task_demo_number": 25,
+  "frames": 263,
+  "xyz_mean_mm": 2.372119755429408,
+  "xyz_median_mm": 1.0282863661814605,
+  "xyz_p95_mm": 8.734279927739328,
+  "xyz_max_mm": 21.741863191834998,
+  "xyz_rmse_mm": 3.896694953925404,
+  "orientation_mean_deg": 0.00441173175216569,
+  "orientation_p95_deg": 0.010696406886330305,
+  "orientation_max_deg": 0.01956799340415706,
+  "gripper_accuracy": 0.9885931558935361,
+  "gripper_mae": 0.023216377419663925
+}

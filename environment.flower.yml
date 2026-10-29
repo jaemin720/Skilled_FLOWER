@@ -1,0 +1,10 @@
+name: flower
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - ipykernel
+  - pip=24.3.1
+  - setuptools<58
+  - wheel=0.45.1
+  - cython=0.29.37

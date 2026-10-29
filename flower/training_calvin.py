@@ -74,10 +74,20 @@ def train(cfg: DictConfig) -> None:
         # Initialize components
         log_rank_0(f"\nInitializing training for seed {cfg.seed}")
         datamodule = hydra.utils.instantiate(cfg.datamodule)
-        model = hydra.utils.instantiate(cfg.model) if get_last_checkpoint(Path.cwd()) is None else \
-               getattr(models_m, cfg.model["_target_"].split(".")[-1]).load_from_checkpoint(get_last_checkpoint(Path.cwd()).as_posix())
+        resume_checkpoint = cfg.get("resume_from_checkpoint")
+        if resume_checkpoint:
+            resume_checkpoint = Path(hydra.utils.to_absolute_path(str(resume_checkpoint)))
+            if not resume_checkpoint.is_file():
+                raise FileNotFoundError(f"Resume checkpoint not found: {resume_checkpoint}")
+            # Trainer.fit restores model, optimizer, scheduler, AMP, EMA and loop
+            # state together. Loading just model weights would restart training.
+            model = hydra.utils.instantiate(cfg.model, load_pretrained=False)
+            log_rank_0(f"Resuming complete training state from {resume_checkpoint}")
+        else:
+            model = hydra.utils.instantiate(cfg.model) if get_last_checkpoint(Path.cwd()) is None else \
+                   getattr(models_m, cfg.model["_target_"].split(".")[-1]).load_from_checkpoint(get_last_checkpoint(Path.cwd()).as_posix())
         
-        if "pretrain_chk" in cfg:
+        if "pretrain_chk" in cfg and not resume_checkpoint:
             initialize_pretrained_weights(model, cfg)
             
         # Setup training
@@ -114,7 +124,10 @@ def train(cfg: DictConfig) -> None:
         trainer = Trainer(**trainer_args)
         
         try:
-            trainer.fit(model, datamodule=datamodule)
+            trainer.fit(
+                model, datamodule=datamodule,
+                ckpt_path=resume_checkpoint.as_posix() if resume_checkpoint else None,
+            )
         except Exception as e:
             log_rank_0("\nDetailed Error Information:")
             log_rank_0("=" * 80)
@@ -157,7 +170,7 @@ def cleanup_distributed():
 if __name__ == "__main__":
     # Set environment variables
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["TOKENIZERS_PARALLELISM"] = 'True'
+    os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
     os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512,expandable_segments:True'
     # Add repo to path
     sys.path.insert(0, str(Path(__file__).absolute().parents[1]))

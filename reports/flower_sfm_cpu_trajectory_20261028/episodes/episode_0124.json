@@ -1,0 +1,17 @@
+{
+  "episode_id": 124,
+  "task": "bnc",
+  "position": 3,
+  "task_demo_number": 25,
+  "frames": 386,
+  "xyz_mean_mm": 1.345732824667798,
+  "xyz_median_mm": 0.8352278820626291,
+  "xyz_p95_mm": 3.8411029244335486,
+  "xyz_max_mm": 8.22020461559817,
+  "xyz_rmse_mm": 1.8864904347264981,
+  "orientation_mean_deg": 0.038837552270478,
+  "orientation_p95_deg": 0.1727021648996783,
+  "orientation_max_deg": 1.5286852297306313,
+  "gripper_accuracy": 0.9922279792746114,
+  "gripper_mae": 0.017044036499576865
+}

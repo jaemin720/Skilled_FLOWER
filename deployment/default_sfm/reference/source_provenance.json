@@ -1,0 +1,31 @@
+{
+  "host": "Kingston",
+  "source_root": "/home/csilab/share_projects/clean_share",
+  "files": {
+    "Real_Robo/configs/default_sfm.json": "1c59bd973fc72f682bce64f04d32b1a631b5508d3cf6b1b2f421bf53efcbccc3",
+    "Real_Robo/env_rpc_client.py": "386a8409b5339a1092e49e37d24e6a055f97c420e1d8c5ce7532cb83edaf200a",
+    "Real_Robo/env_rpc_server.py": "929b1e229d43383a12d266af38c77a131218905a134c1bf9e071c37b9c3d3cb7",
+    "Real_Robo/inference/client.py": "1328c0f15e67ce803245f2e00a5a84f595fdd91ee66f6d87b41e7e92e2be6e48",
+    "Real_Robo/inference/dry_run.py": "4ad8afc83e6716fbe836cc169d41b8da5f0e8a98772fca7e0b856a43bfeaaf9b",
+    "Real_Robo/inference/policy_io.py": "41ecb6b51ae8ba913a9c9a8480e62125da52b197aaaaedd8b2f46bda411dcae1",
+    "Real_Robo/inference/protocol.py": "e476996b260904631b3bcee53c83a99ff6edcaea986ff7e012f1fb85e53bdf99",
+    "Real_Robo/inference/rollout.py": "5847ed42a271c8de1e583a387beb40ad6d1e0253652627c43d583aa2d15f8ea0",
+    "Real_Robo/resource_paths.py": "408a0ba3ba2e9af3f8ecbdd27ffb8c8c01f1571a002e987876c4ab78b2ec344b",
+    "Real_Robo/ros_environment.py": "bef877d583898be0e24363697278a4de163e6dea33ce293c6c1c05c9bfa39058",
+    "preprocess/action_chunks.py": "480bddd09650f496e599bb64b85c092fa7f043faa68605f929e68b867a33f85a",
+    "preprocess/action_layout.py": "143c244127fe95914b7ff90b38ac183ecccc3f976a3827e7a6059df3303ad308",
+    "preprocess/configs/config_right_default.yaml": "59785432d027a46842a7c5e0b6040103116adf5efa0b61c3c8969d39ac5d32e8",
+    "preprocess/convert.py": "805eb014226c2c1d01a2b233e601637ec9a44101d213debb52d6b7e1b98dae5e",
+    "preprocess/gripper.py": "fd0b618cd0c4c8163d899f8025074b927f53e64bad0fa16084f72af6ae28c210",
+    "preprocess/inference.py": "2514ddf0907980b17cc9875e14735fab6d8f8ea1451499d1934e862534068f08",
+    "preprocess/normalization.py": "d4bdd7c476d735e7a897df4a35b3c5e1144806d4e3b9b973d5646f3318a35944",
+    "preprocess/output/chunk_delta_sample/inference_config.json": "710a133b5238dbe48ac37c2259402bd37a8f75ae827ca5c46fdd4e902276d01a",
+    "preprocess/output/chunk_delta_sample/normalization.json": "e883a111299b913865ae1d2e572bb1d163f4108ccb76157f01929021382ac490",
+    "rb_env/envs/action_adapter.py": "e37bd54d8b429998d4a8900e9d17dc65597bbd844952bd27cd08b86d97df2f94",
+    "rb_env/envs/action_commands.py": "ff6b17a7bda1c2ccee7942f65a9bf4711679c35ede27070b86f47d6b6f4e8d76",
+    "rb_env/envs/builder_integration.py": "307b07a6a12b8c3cbab2ce1b2004f648219a23de965184a79c171652e4808c19",
+    "rb_env/envs/chunk_interpreter.py": "57efec865584e7b8ecfb07d5088bd1ba7e94fb2963952dcfc8ce851c6c401fc5",
+    "rb_env/gripper_drivers/base.py": "3e1ef8d18ea0a3b889f35956ac8d6acd112f88351530788749330a1ec1f3edff",
+    "tools/demo_viz/schema.py": "42b6b848251bc92b79b9fb47e3f0ec30c11e175565eded0c29975c3a516a322c"
+  }
+}

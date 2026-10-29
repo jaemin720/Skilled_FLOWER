@@ -1,0 +1,58 @@
+defaults:
+  - config_custom_calvin_alltrain
+  - override datamodule: default_sfm
+  - _self_
+
+root_data_dir: /home/jack/Skilled_FLOWER/datasets/default_sfm_crop_v2
+lang_folder: lang_annotations
+log_dir: /home/jack/Skilled_FLOWER/logs/default_sfm
+seed: 42
+devices: 2
+# Per-GPU batch; global batch is 128 with GPUs 0 and 1.
+batch_size: 64
+max_epochs: 20
+proprio_dims: 13
+# Future action chunk used by both the dataset and model; no reprocessing needed.
+act_seq_len: 10
+# Actions executed before replanning during rollout (independent of chunk length).
+multistep: 5
+use_extracted_rel_actions: true
+benchmark_name: default_sfm
+
+model:
+  # Use the pinned local Florence files; policy weights come from flower_vla_pret.
+  vlm_path: /home/jack/.cache/huggingface/hub/models--microsoft--Florence-2-large/snapshots/21a599d414c4d928c9032694c424fb94458e3594
+  lowdim_obs_dim: ${proprio_dims}
+  # 500 Hz F/T: 50 oldest-to-newest samples (~100 ms), already standardized.
+  # GRU resets per window; its last hidden state is projected to dit_dim.
+  use_force_history_adaln: true
+  force_history_encoder_type: gru
+  force_history_length: 50
+  lr_scheduler:
+    lr_scheduler:
+      # ceil(ceil(133189 windows / 2 GPUs) / 64) * 20 epochs.
+      total_steps: 20820
+
+trainer:
+  log_every_n_steps: 20
+  enable_progress_bar: false
+
+callbacks:
+  checkpoint:
+    every_n_epochs: 5
+    save_on_train_epoch_end: true
+    save_top_k: -1
+    # Lightning 2.0 writes save_last at every epoch, bypassing every_n_epochs.
+    save_last: false
+    monitor: null
+    filename: 'epoch{epoch:03d}'
+    auto_insert_metric_name: false
+  status:
+    _target_: flower.callbacks.training_status.TrainingStatus
+    every_n_steps: 20
+
+logger:
+  name: flower_default_sfm_crop_v2
+  group: default_sfm
+  project: flower_default_sfm
+  offline: true

@@ -1,0 +1,17 @@
+{
+  "episode_id": 424,
+  "task": "usb",
+  "position": 3,
+  "task_demo_number": 25,
+  "frames": 267,
+  "xyz_mean_mm": 3.9312420401468926,
+  "xyz_median_mm": 2.3554672744736833,
+  "xyz_p95_mm": 11.665082622878504,
+  "xyz_max_mm": 38.67072592437083,
+  "xyz_rmse_mm": 5.817049862962739,
+  "orientation_mean_deg": 0.003869654093833038,
+  "orientation_p95_deg": 0.009664883118976274,
+  "orientation_max_deg": 0.027482418389486712,
+  "gripper_accuracy": 0.9962546816479401,
+  "gripper_mae": 0.007636930388904243
+}

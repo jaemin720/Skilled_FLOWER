@@ -296,20 +296,6 @@ class ExtendedDiskDataset(DiskDataset):
                 )
             episode["right_force_history"] = force_history
 
-        # SKILL_VAE_ADALN MOD:
-        # Flow target actions는 current_t부터 시작하지만,
-        # SkillVAE history는 current_t 이전 action 32개만 사용합니다.
-        current_t = start_idx + self.obs_seq_len - 1
-
-        skill_history = self._build_skill_prev_history(
-            current_t=current_t,
-            history_len=32,
-            action_dim=7,
-            gripper_state_obs_idx=6,
-        )
-
-        episode.update(skill_history)
-
         if self.with_lang:
             episode["language"] = self.lang_ann[self.lang_lookup[idx]][0]  # TODO check  [0]
             episode["language_text"] = self.lang_text[self.lang_lookup[idx]] #[0]  # TODO check  [0]
@@ -353,81 +339,6 @@ class ExtendedDiskDataset(DiskDataset):
             for idx in range(start_idx, end_idx + 1 - self.min_window_size):
                 episode_lookup.append(idx)
         return np.array(episode_lookup)
-
-    def _load_rel_action_at(self, file_idx: int) -> np.ndarray:
-        # SKILL_VAE_ADALN MOD: SkillVAE action history를 만들기 위해 특정 timestep의 rel_actions만 읽습니다.
-        # use_extracted_rel_actions=True이면 기존 extracted ep_rel_actions.npy를 재사용합니다.
-        if self.use_extracted_rel_actions:
-            ex_idx = self.extracted_ep_npz_name_to_npy_idx[file_idx]
-            return self.extracted_ep_rel_actions[ex_idx].astype(np.float32)
-
-        ep = self.load_file(self._get_episode_name(file_idx))
-        return np.asarray(ep["rel_actions"], dtype=np.float32)
-
-
-    def _load_robot_obs_at(self, file_idx: int) -> np.ndarray:
-        # SKILL_VAE_ADALN MOD: gripper relabeling용 gripper state를 얻기 위해 robot_obs를 읽습니다.
-        ep = self.load_file(self._get_episode_name(file_idx))
-        return np.asarray(ep["robot_obs"], dtype=np.float32)
-
-
-    def _build_skill_prev_history(
-        self,
-        current_t: int,
-        history_len: int = 32,
-        action_dim: int = 7,
-        gripper_state_obs_idx: int = 6,
-    ) -> Dict[str, np.ndarray]:
-        # SKILL_VAE_ADALN MOD:
-        # current_t 직전까지의 과거 action만 SkillVAE conditioner로 사용합니다.
-        # current_t action은 Flow target의 첫 action이므로 history에 넣으면 leakage입니다.
-        ep_start, _ = self.find_sequence_boundaries(current_t)
-
-        hist = np.zeros((history_len, action_dim), dtype=np.float32)
-        valid = np.zeros((history_len,), dtype=np.float32)
-        gripper_states = np.zeros((history_len,), dtype=np.float32)
-
-        # SKILL_VAE_ADALN MOD:
-        # padding action은 [0,0,0,0,0,0,1]로 설정합니다.
-        # 실제 과거 action이 채워지는 위치는 아래 hist[-n:] = rel_actions에서 덮어써집니다.
-        gripper_action_idx = action_dim - 1
-        hist[:, gripper_action_idx] = 1.0
-
-        hist_start = max(ep_start, current_t - history_len)
-        hist_indices = list(range(hist_start, current_t))
-
-        if len(hist_indices) == 0:
-            return {
-                "skill_prev_actions": hist,
-                "skill_prev_valid_mask": valid,
-                "skill_prev_gripper_states": gripper_states,
-            }
-
-        rel_actions = np.stack(
-            [self._load_rel_action_at(i) for i in hist_indices],
-            axis=0,
-        ).astype(np.float32)
-
-        robot_obs = np.stack(
-            [self._load_robot_obs_at(i) for i in hist_indices],
-            axis=0,
-        ).astype(np.float32)
-
-        n = len(hist_indices)
-        hist[-n:] = rel_actions
-        valid[-n:] = 1.0
-
-        # preprocess에서 robot_obs는 pose 6D + gripper 1D + optional F/T 순서이므로
-        # include_right_ft 여부와 상관없이 gripper는 robot_obs[6]입니다.
-        gripper_states[-n:] = robot_obs[:, gripper_state_obs_idx]
-
-        return {
-            "skill_prev_actions": hist,
-            "skill_prev_valid_mask": valid,
-            "skill_prev_gripper_states": gripper_states,
-        }
-
-
 
 
 class SubsetDiskDataset(ExtendedDiskDataset):

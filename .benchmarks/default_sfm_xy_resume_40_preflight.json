@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "checkpoint": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt",
+  "completed_epochs": 20,
+  "resume_epoch": 21,
+  "global_step": 20820,
+  "target_epochs": 40,
+  "target_steps": 41640,
+  "proprio_dim": 13,
+  "per_gpu_batch_size": 64,
+  "initial_lr": 1.0000000078784441e-05,
+  "final_lr": 1e-05,
+  "checkpoint_every_n_epochs": 5,
+  "free_disk_gib": 106.61528778076172,
+  "new_checkpoint_space_gib": 49.97039057314396
+}

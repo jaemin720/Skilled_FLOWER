@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import logging
 import math
 from dataclasses import dataclass, field
 from typing import Optional
@@ -30,6 +31,8 @@ from torch.optim import Optimizer
 
 from . import register_scheduler, LearningRateSchedulerConfigs
 from .lr_scheduler import LearningRateScheduler
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -46,6 +49,7 @@ class TriStageLRSchedulerConfigs(LearningRateSchedulerConfigs):
         },
     )
     total_steps: int = field(default=400000, metadata={"help": "Total training steps."})
+    extend_on_resume: bool = field(default=False, metadata={"help": "Extend a restored decay without resetting its learning rate."})
 
 
 @register_scheduler("tri_stage", dataclass=TriStageLRSchedulerConfigs)
@@ -94,6 +98,9 @@ class TriStageLRScheduler(LearningRateScheduler):
         super(TriStageLRScheduler, self).__init__(optimizer, configs.lr_scheduler.init_lr)
 
         self.phase_ratio = eval(configs.lr_scheduler.phase_ratio)
+        self.total_steps = int(configs.lr_scheduler.total_steps)
+        self.extend_on_resume = bool(configs.lr_scheduler.get("extend_on_resume", False))
+        self.resumed_decay = None
 
         self.warmup_steps = int(configs.lr_scheduler.total_steps * self.phase_ratio[0])
         self.hold_steps = int(configs.lr_scheduler.total_steps * self.phase_ratio[1])
@@ -107,6 +114,39 @@ class TriStageLRScheduler(LearningRateScheduler):
         self.decay_factor = -math.log(configs.lr_scheduler.final_lr_scale) / self.decay_steps
         self.update_step = 0
         self.lr = self.init_lr
+        # The first optimizer update happens before Lightning calls step().
+        self.set_lr(self.optimizer, self.init_lr)
+
+    def load_state_dict(self, state_dict):
+        """Optionally extend only the future decay after restoring a checkpoint.
+
+        The optimizer keeps its saved LR for the first resumed update. The new
+        cosine reaches the saved final LR on the requested final update. Its
+        anchor is checkpointed, so later resumes do not restart the cosine.
+        """
+        requested_total = self.total_steps
+        extend = self.extend_on_resume
+        super().load_state_dict(state_dict)
+        self.total_steps = int(state_dict.get(
+            "total_steps", self.warmup_steps + self.hold_steps + self.decay_steps
+        ))
+        self.extend_on_resume = extend
+        if not extend or requested_total == self.total_steps:
+            return
+        if requested_total < self.total_steps or requested_total <= self.update_step:
+            raise ValueError("extend_on_resume requires a later training endpoint")
+        if self.update_step < self.warmup_steps + self.hold_steps:
+            raise ValueError("extend_on_resume requires a checkpoint in the decay stage or later")
+        self.resumed_decay = {
+            "start_step": self.update_step,
+            "start_lr": self.lr,
+            "end_step": requested_total,
+        }
+        self.total_steps = requested_total
+        logger.info(
+            "Extended restored LR decay: step %s, LR %.12g -> step %s, LR %.12g",
+            self.update_step, self.lr, self.total_steps, self.final_lr,
+        )
 
     def _decide_stage(self):
         if self.update_step < self.warmup_steps:
@@ -130,7 +170,16 @@ class TriStageLRScheduler(LearningRateScheduler):
     def step(self, val_loss: Optional[torch.FloatTensor] = None):
         stage, steps_in_stage = self._decide_stage()
 
-        if stage == 0:
+        if self.resumed_decay is not None:
+            anchor = self.resumed_decay
+            progress = min(1.0, max(0.0,
+                (self.update_step + 1 - anchor["start_step"])
+                / (anchor["end_step"] - anchor["start_step"])
+            ))
+            self.lr = self.final_lr + 0.5 * (anchor["start_lr"] - self.final_lr) * (
+                1 + math.cos(progress * math.pi)
+            )
+        elif stage == 0:
             self.lr = self.init_lr + self.warmup_rate * steps_in_stage
         elif stage == 1:
             self.lr = self.peak_lr

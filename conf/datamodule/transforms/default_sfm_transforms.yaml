@@ -1,0 +1,26 @@
+# Images have already been cropped and letterboxed to 224x224.
+# SfmDiskDataset applies one shared color jitter to both camera views and
+# restores the black padding before these model input transforms.
+train:
+  rgb_static:
+    - _target_: flower.utils.transforms.ScaleImageTensor
+    - _target_: torchvision.transforms.Normalize
+      mean: [0.48145466, 0.4578275, 0.40821073]
+      std: [0.26862954, 0.26130258, 0.27577711]
+  rgb_gripper:
+    - _target_: flower.utils.transforms.ScaleImageTensor
+    - _target_: torchvision.transforms.Normalize
+      mean: [0.48145466, 0.4578275, 0.40821073]
+      std: [0.26862954, 0.26130258, 0.27577711]
+
+val:
+  rgb_static:
+    - _target_: flower.utils.transforms.ScaleImageTensor
+    - _target_: torchvision.transforms.Normalize
+      mean: [0.48145466, 0.4578275, 0.40821073]
+      std: [0.26862954, 0.26130258, 0.27577711]
+  rgb_gripper:
+    - _target_: flower.utils.transforms.ScaleImageTensor
+    - _target_: torchvision.transforms.Normalize
+      mean: [0.48145466, 0.4578275, 0.40821073]
+      std: [0.26862954, 0.26130258, 0.27577711]

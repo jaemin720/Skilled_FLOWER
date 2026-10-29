@@ -1,0 +1,12 @@
+{
+  "state": "completed",
+  "updated_at": "2026-10-28T05:26:28.145942+00:00",
+  "frames_done": 8023,
+  "total_frames": 8023,
+  "episodes": 27,
+  "elapsed_seconds": 2106.661653530784,
+  "device": "cpu",
+  "dtype": "float32",
+  "cuda_initialized": false,
+  "pdf": "/home/jack/Skilled_FLOWER/reports/flower_sfm_cpu_trajectory_20261028/flower_sfm_training_action_trajectories_cpu.pdf"
+}

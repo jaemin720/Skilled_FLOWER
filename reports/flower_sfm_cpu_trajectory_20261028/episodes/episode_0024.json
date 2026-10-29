@@ -1,0 +1,17 @@
+{
+  "episode_id": 24,
+  "task": "audio_jack",
+  "position": 3,
+  "task_demo_number": 25,
+  "frames": 279,
+  "xyz_mean_mm": 2.365984590847868,
+  "xyz_median_mm": 1.0838439896159417,
+  "xyz_p95_mm": 8.28560640519857,
+  "xyz_max_mm": 24.467980997754392,
+  "xyz_rmse_mm": 4.298998311361805,
+  "orientation_mean_deg": 0.004218675063571817,
+  "orientation_p95_deg": 0.010434429739983491,
+  "orientation_max_deg": 0.0279281944514636,
+  "gripper_accuracy": 0.996415770609319,
+  "gripper_mae": 0.007390564701463159
+}

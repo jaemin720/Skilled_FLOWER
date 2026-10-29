@@ -1,0 +1,17 @@
+defaults:
+  - config_default_sfm
+  - _self_
+
+# Ablation: remove only absolute X/Y from the stored 13-D state.
+# Retained order: gripper,z,roll,pitch,yaw,vx,vy,vz,wx,wy,wz.
+# Model input width and dataset state width both interpolate proprio_dims.
+proprio_dims: 11
+log_dir: /home/jack/Skilled_FLOWER/logs/default_sfm_no_xy
+
+datamodule:
+  proprioception_dims:
+    keep_indices: [[0, 1], [3, 13]]
+
+logger:
+  name: flower_default_sfm_crop_v2_no_xy
+  group: default_sfm_no_xy

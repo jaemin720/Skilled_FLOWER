@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "bundle_id": "07c86390e0d1caacc8f9d0d15b14de5359c101eb1b46017fc29494da99eefd9a",
+  "observations_tested": 3,
+  "observation_max_abs_error": {
+    "robot_obs": 0,
+    "right_force_history": 0,
+    "rgb_static": 0,
+    "rgb_gripper": 0
+  },
+  "action_horizon_tested": 10,
+  "gripper_labels_unchanged": true,
+  "source_files_unchanged": 25,
+  "client_sha256": "386a8409b5339a1092e49e37d24e6a055f97c420e1d8c5ce7532cb83edaf200a",
+  "model_loaded": false,
+  "gpu_used": false,
+  "robot_started": false,
+  "http_server_started": false,
+  "scope": "Synthetic preprocessing and wire format only; no model or hardware execution"
+}

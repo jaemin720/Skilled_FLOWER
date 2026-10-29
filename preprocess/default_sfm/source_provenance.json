@@ -1,0 +1,22 @@
+{
+  "sfm_preprocessing.py": {
+    "source": "/home/jack/TurboVLA_Skill/TurboVLA_Skill/turbovla/data/sfm_preprocessing.py",
+    "sha256": "ce06b5aa85edc9c7824b34402e89ab7fdadf4134cd7b23ad1c979e033fbd4464"
+  },
+  "experiment_plan_crop_v2.yaml": {
+    "source": "/home/jack/TurboVLA_Skill/TurboVLA_Skill/experiments/default_sfm/crop_plans/experiment_plan_crop_v2.yaml",
+    "sha256": "91cbc2a86660f4bba2ec658ef7a4ba2cb704228d4510e8febb021d7889c2b2df"
+  },
+  "references/turbovla_preprocess.py": {
+    "source": "/home/jack/TurboVLA_Skill/TurboVLA_Skill/scripts/default_sfm/preprocess.py",
+    "sha256": "5f93bc260c4ed69678725e56b16e48c2033a1adc3f82ce20e4222e7fde5c4b0c"
+  },
+  "references/csilab_convert.py": {
+    "source": "/home/jack/TurboVLA_Skill/TurboVLA_Skill/experiments/default_sfm/preprocessing_audit/csilab_source_snapshot/preprocess/convert.py",
+    "sha256": "e35f2f104b59c872054b91c705fa1d6f32259aec746ec9d1fe4e00a1f144cf01"
+  },
+  "references/gripper.py": {
+    "source": "/home/jack/TurboVLA_Skill/TurboVLA_Skill/experiments/default_sfm/preprocessing_audit/faflow_held_reference/gripper.py",
+    "sha256": "8bb71d9d3b689ba42dfa5432677d184feb8eac99a802483b6028fba731981c5d"
+  }
+}

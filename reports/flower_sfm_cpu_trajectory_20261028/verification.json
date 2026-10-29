@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "device": "cpu",
+  "dtype": "float32",
+  "cpu_workers": 9,
+  "cuda_initialized": false,
+  "episodes": 27,
+  "observations": 8023,
+  "all_predictions_finite": true,
+  "all_csv_row_counts_match": true,
+  "no_future_action_padding": true,
+  "decoded_targets_match_recorded_state_plus_delta": true,
+  "independently_recomputed_metrics": {
+    "xyz_mean_mm": 1.4710282390206069,
+    "xyz_p95_mm": 5.08233273284994,
+    "xyz_max_mm": 38.67072592437083,
+    "orientation_mean_deg": 0.0500481329903844,
+    "gripper_accuracy": 0.9910258008226349
+  },
+  "worst_xyz_examples": [
+    {
+      "episode_id": 424,
+      "task": "usb",
+      "position": 3,
+      "time_s": 14.001405477523804,
+      "xyz_error_mm": 38.67072592437083
+    },
+    {
+      "episode_id": 349,
+      "task": "outlet",
+      "position": 5,
+      "time_s": 25.2021484375,
+      "xyz_error_mm": 25.20538113198874
+    },
+    {
+      "episode_id": 24,
+      "task": "audio_jack",
+      "position": 3,
+      "time_s": 3.0986642837524414,
+      "xyz_error_mm": 24.467980997754392
+    },
+    {
+      "episode_id": 0,
+      "task": "audio_jack",
+      "position": 1,
+      "time_s": 18.79539680480957,
+      "xyz_error_mm": 24.038662066150195
+    },
+    {
+      "episode_id": 74,
+      "task": "barlatch",
+      "position": 3,
+      "time_s": 9.600337743759155,
+      "xyz_error_mm": 23.89350910788227
+    }
+  ],
+  "pdf_sha256": "e78035016aaff76c9c213bc41a0d13e9919a90444245137beb960bbad9949f02",
+  "pdf_pages": 28,
+  "all_episode_pages_present": true,
+  "overview_and_representative_pages_visually_checked": true
+}
