@@ -188,6 +188,8 @@ class ForceHistoryTests(unittest.TestCase):
             with self.subTest(encoder_type=encoder_type):
                 model = make_model(force_history_encoder_type=encoder_type)
                 saved_hparams = dict(model.hparams)
+                for key in ("force_history_latent_dim", "adaln_conditioning_type", "adaln_conditioning_hidden_dim"):
+                    saved_hparams.pop(key)
                 if encoder_type == "conv1d":
                     # Old checkpoints predate the encoder selector and GRU options.
                     for key in ("force_history_encoder_type", "force_history_gru_layers", "force_history_length"):

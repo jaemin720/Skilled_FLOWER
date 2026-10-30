@@ -1,0 +1,12 @@
+# Optional model override; compose after the selected SFM baseline config.
+# Existing model defaults (Florence, DiT, optimizer, state) are inherited.
+use_force_history_adaln: true
+force_history_encoder_type: fafmp_gru
+force_history_dim: 6
+force_history_hidden_dim: 128
+force_history_latent_dim: 128
+force_history_gru_layers: 1
+force_history_dropout: 0.0
+force_history_length: 50
+adaln_conditioning_type: concat_mlp
+adaln_conditioning_hidden_dim: 1024

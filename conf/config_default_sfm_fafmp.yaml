@@ -1,0 +1,11 @@
+defaults:
+  - config_default_sfm
+  - model/ft_fafmp
+  - _self_
+
+# Same data/state/training settings as the 13-D normalized-state baseline.
+log_dir: /home/jack/Skilled_FLOWER/logs/default_sfm_fafmp
+
+logger:
+  name: flower_default_sfm_crop_v2_fafmp
+  group: default_sfm_fafmp

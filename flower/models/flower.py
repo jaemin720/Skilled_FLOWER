@@ -19,7 +19,9 @@ import wandb
 from timm.layers.mlp import Mlp
 from transformers import AutoModelForCausalLM, AutoProcessor, AutoConfig
 
-from flower.models.networks.force_history import GRUHistoryEncoder
+from flower.models.networks.force_history import (
+    GRUHistoryEncoder, FAFMPGRUHistoryEncoder, FAFMPConditioningMLP,
+)
 from flower.models.networks.transformers import (
     TimestepEmbedder,
     SharedAdaLNController,
@@ -157,6 +159,10 @@ class FLOWERVLA(pl.LightningModule):
         force_history_encoder_type: str = "conv1d",
         force_history_gru_layers: int = 1,
         force_history_length: Optional[int] = None,
+        # Opt-in FAFMP encoder/conditioning; absent fields preserve old checkpoints.
+        force_history_latent_dim: int = 128,
+        adaln_conditioning_type: str = "sum",
+        adaln_conditioning_hidden_dim: Optional[int] = None,
         **kwargs,
     ):
         super().__init__()
@@ -188,6 +194,9 @@ class FLOWERVLA(pl.LightningModule):
             force_history_encoder_type=force_history_encoder_type,
             force_history_gru_layers=force_history_gru_layers,
             force_history_length=force_history_length,
+            force_history_latent_dim=force_history_latent_dim,
+            adaln_conditioning_type=adaln_conditioning_type,
+            adaln_conditioning_hidden_dim=adaln_conditioning_hidden_dim,
         )
         self.obs_modalities = []
         # Initialize model dimensions
@@ -392,8 +401,20 @@ class FLOWERVLA(pl.LightningModule):
         self.force_history_kernel_size = int(self.force_history_kernel_size)
         self.force_history_dropout = float(self.force_history_dropout)
         self.force_history_gru_layers = int(self.force_history_gru_layers)
-        if self.force_history_encoder_type not in ("gru", "conv1d"):
-            raise ValueError("force_history_encoder_type must be 'gru' or 'conv1d'")
+        if self.force_history_encoder_type not in ("gru", "conv1d", "fafmp_gru"):
+            raise ValueError("force_history_encoder_type must be 'gru', 'conv1d' or 'fafmp_gru'")
+        self.force_history_latent_dim = int(self.force_history_latent_dim)
+        if self.force_history_latent_dim < 1:
+            raise ValueError("force_history_latent_dim must be positive")
+        if self.adaln_conditioning_type not in ("sum", "concat_mlp"):
+            raise ValueError("adaln_conditioning_type must be 'sum' or 'concat_mlp'")
+        if self.adaln_conditioning_hidden_dim is not None:
+            self.adaln_conditioning_hidden_dim = int(self.adaln_conditioning_hidden_dim)
+            if self.adaln_conditioning_hidden_dim < 1:
+                raise ValueError("adaln_conditioning_hidden_dim must be positive or None")
+        if self.use_force_history_adaln and self.force_history_encoder_type == "fafmp_gru":
+            if self.force_history_gru_layers != 1 or self.force_history_dropout != 0.0:
+                raise ValueError("FAFMP GRU uses exactly one recurrent layer and force_history_dropout=0")
         if self.force_history_length is not None:
             self.force_history_length = int(self.force_history_length)
             if self.force_history_length < 1:
@@ -414,6 +435,11 @@ class FLOWERVLA(pl.LightningModule):
             
         if self.dit_dim % self.n_heads != 0:
             raise ValueError(f"dit_dim ({self.dit_dim}) must be divisible by n_heads ({self.n_heads})")
+        self.force_history_embedding_dim = (
+            self.force_history_latent_dim if self.force_history_encoder_type == "fafmp_gru" else self.dit_dim
+        )
+        if self.adaln_conditioning_type == "sum" and self.force_history_embedding_dim != self.dit_dim:
+            raise ValueError("Sum conditioning requires F/T embedding width == dit_dim; use concat_mlp for FAFMP")
 
 
     def _setup_vlm(self, vlm_path: str, freeze_vision_tower: bool, freeze_florence: bool):
@@ -468,12 +494,17 @@ class FLOWERVLA(pl.LightningModule):
             encoder_kwargs = dict(
                 input_dim=self.force_history_dim,
                 hidden_dim=self.force_history_hidden_dim,
-                out_dim=dit_dim,
+                out_dim=self.force_history_embedding_dim,
                 dropout=self.force_history_dropout,
             )
             if self.force_history_encoder_type == "gru":
                 self.force_history_encoder = GRUHistoryEncoder(
                     **encoder_kwargs, n_layers=self.force_history_gru_layers,
+                )
+            elif self.force_history_encoder_type == "fafmp_gru":
+                self.force_history_encoder = FAFMPGRUHistoryEncoder(
+                    input_dim=self.force_history_dim, hidden_dim=self.force_history_hidden_dim,
+                    out_dim=self.force_history_embedding_dim,
                 )
             else:
                 self.force_history_encoder = CausalConv1dHistoryEncoder(
@@ -529,6 +560,17 @@ class FLOWERVLA(pl.LightningModule):
                     out_features=dit_dim,
                     drop=0.2,
                 ).to(self.device)
+
+        # Create no extra parameters for legacy models, preserving key order and
+        # positional EMA mapping. Florence and the DiT blocks remain unchanged.
+        self.conditioning_mlp = None
+        if self.adaln_conditioning_type == "concat_mlp":
+            input_dim = self.force_history_embedding_dim + 3 * dit_dim
+            if self.use_adaln_cond:
+                input_dim += dit_dim
+            self.conditioning_mlp = FAFMPConditioningMLP(
+                input_dim, self.adaln_conditioning_hidden_dim or dit_dim, dit_dim,
+            )
 
     def configure_optimizers(self):
         """Configure optimizers and schedulers"""
@@ -804,7 +846,7 @@ class FLOWERVLA(pl.LightningModule):
         dtype: torch.dtype,
     ) -> torch.Tensor:
         if not self.use_force_history_adaln:
-            return torch.zeros(batch_size, self.dit_dim, device=device, dtype=dtype)
+            return torch.zeros(batch_size, self.force_history_embedding_dim, device=device, dtype=dtype)
         if self.force_history_encoder is None:
             raise RuntimeError("use_force_history_adaln=True이지만 force_history_encoder가 초기화되지 않았습니다.")
 
@@ -844,11 +886,11 @@ class FLOWERVLA(pl.LightningModule):
                     dtype=default_dtype,
                 )
             else:
-                if force_embeds.shape != (B, self.dit_dim):
-                    raise ValueError(f"force_history_embeds must be [{B},{self.dit_dim}]")
+                if force_embeds.shape != (B, self.force_history_embedding_dim):
+                    raise ValueError(f"force_history_embeds must be [{B},{self.force_history_embedding_dim}]")
                 force_embeds = force_embeds.to(device=z.device, dtype=default_dtype)
         else:
-            force_embeds = torch.zeros(B, self.dit_dim, device=z.device, dtype=default_dtype)
+            force_embeds = torch.zeros(B, self.force_history_embedding_dim, device=z.device, dtype=default_dtype)
         
         # Encode actions
         z, valid_dims = self.encode_actions(z, action_type)
@@ -857,22 +899,31 @@ class FLOWERVLA(pl.LightningModule):
         if not self.use_rope and not self.use_nope:
             z = z + self.positional_encoding
         
-        # FT joins time, control-frequency and proprioception conditioning.
         # global_cond drives both shared and per-block AdaLN modulation.
-        t_emb = (
-            stateless_norm(self.t_embedder(t))
-            + stateless_norm(frequency_embeds).squeeze(1)
-            + stateless_norm(proprio_embeds).squeeze(1)
-            + stateless_norm(force_embeds).squeeze(1)
-        )
-        cond = self.cond_linear(self.cond_norm(cond))
-        
-        # Set up conditioning
-        if self.use_adaln_cond:
-            vlm_token = cond[:, 0, :] if self.use_readout_token else cond.mean(dim=1)
-            global_cond = vlm_token + t_emb
+        if self.adaln_conditioning_type == "concat_mlp":
+            cond = self.cond_linear(self.cond_norm(cond))
+            # The frequency path retains a singleton token axis; concat needs
+            # one [B,D] vector from each branch, as in the legacy sum below.
+            conditions = [force_embeds, self.t_embedder(t),
+                          frequency_embeds.squeeze(1), proprio_embeds.squeeze(1)]
+            if self.use_adaln_cond:
+                conditions.append(cond[:, 0, :] if self.use_readout_token else cond.mean(dim=1))
+            # FAFMP passes the latent directly, without the old per-branch norm.
+            global_cond = self.conditioning_mlp(*conditions)
         else:
-            global_cond = t_emb
+            # Preserve the original arithmetic and normalization for old models.
+            t_emb = (
+                stateless_norm(self.t_embedder(t))
+                + stateless_norm(frequency_embeds).squeeze(1)
+                + stateless_norm(proprio_embeds).squeeze(1)
+                + stateless_norm(force_embeds).squeeze(1)
+            )
+            cond = self.cond_linear(self.cond_norm(cond))
+            if self.use_adaln_cond:
+                vlm_token = cond[:, 0, :] if self.use_readout_token else cond.mean(dim=1)
+                global_cond = vlm_token + t_emb
+            else:
+                global_cond = t_emb
         
         # Setup context
         cx = z

@@ -1,0 +1,11 @@
+defaults:
+  - config_default_sfm_no_xy
+  - model/ft_fafmp
+  - _self_
+
+# Same data/state/training settings as the 11-D normalized-state baseline.
+log_dir: /home/jack/Skilled_FLOWER/logs/default_sfm_no_xy_fafmp
+
+logger:
+  name: flower_default_sfm_crop_v2_no_xy_fafmp
+  group: default_sfm_no_xy_fafmp

@@ -1,0 +1,96 @@
+{
+  "device": "cpu/meta",
+  "training_started": false,
+  "legacy_regression": {
+    "conv1d": {
+      "key_order_equal": true,
+      "initial_weights_bitwise_equal": true,
+      "velocity_max_abs_difference": 0.0,
+      "actions_max_abs_difference": 0.0
+    },
+    "gru": {
+      "key_order_equal": true,
+      "initial_weights_bitwise_equal": true,
+      "velocity_max_abs_difference": 0.0,
+      "actions_max_abs_difference": 0.0
+    },
+    "disabled": {
+      "key_order_equal": true,
+      "initial_weights_bitwise_equal": true,
+      "velocity_max_abs_difference": 0.0,
+      "actions_max_abs_difference": 0.0
+    }
+  },
+  "actual_checkpoints": [
+    {
+      "path": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/seed_42/saved_models/epoch034.ckpt",
+      "proprio_dim": 13,
+      "core_tensors": 320,
+      "strict_core_key_shape_load": true,
+      "core_key_order_unchanged": true,
+      "ema_key_count_and_shapes_valid": true,
+      "encoder": "gru",
+      "conditioning": "sum",
+      "validation_scope": "Metadata only; no checkpoint inference or Florence weights loaded"
+    },
+    {
+      "path": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/saved_models/epoch039.ckpt",
+      "proprio_dim": 11,
+      "core_tensors": 320,
+      "strict_core_key_shape_load": true,
+      "core_key_order_unchanged": true,
+      "ema_key_count_and_shapes_valid": true,
+      "encoder": "gru",
+      "conditioning": "sum",
+      "validation_scope": "Metadata only; no checkpoint inference or Florence weights loaded"
+    },
+    {
+      "path": "/home/jack/Skilled_FLOWER/logs/default_sfm_unnormalized_state/runs/flower_sfm_no_xy_unnorm_e40_b64_20261029_200954/seed_42/saved_models/epoch039.ckpt",
+      "proprio_dim": 11,
+      "core_tensors": 320,
+      "strict_core_key_shape_load": true,
+      "core_key_order_unchanged": true,
+      "ema_key_count_and_shapes_valid": true,
+      "encoder": "gru",
+      "conditioning": "sum",
+      "validation_scope": "Metadata only; no checkpoint inference or Florence weights loaded"
+    }
+  ],
+  "fafmp_original_numerical_reference": {
+    "history_shape": [
+      2,
+      50,
+      6
+    ],
+    "hidden_dim": 128,
+    "latent_dim": 128,
+    "conditioning_dims": [
+      3200,
+      1024,
+      1024
+    ],
+    "encoder_max_abs_difference": 4.76837158203125e-07,
+    "conditioning_max_abs_difference": 1.9073486328125e-06,
+    "comparison": "Identical parameters/input, original FAFMP Flax CPU versus ported PyTorch CPU"
+  },
+  "florence_methods_unchanged": true,
+  "cpu_tests": {
+    "command": "python -m pytest -q --disable-warnings tests/test_fafmp_conditioning.py tests/test_force_history.py tests/test_flower_rpc.py",
+    "passed": 43,
+    "failed": 0,
+    "warnings": "15 dependency deprecation warnings"
+  },
+  "resolved_config_check": {
+    "config": "config_default_sfm_no_xy_fafmp",
+    "print_only_exit_code": 0,
+    "proprio_dim": 11,
+    "action_horizon": 10,
+    "encoder": "fafmp_gru",
+    "conditioning": "concat_mlp"
+  },
+  "reference_source_sha256": "2716e71a5f646888116374112f32711ae36a1c36ae9c99562b4d7c3486f2a110",
+  "implementation_sha256": {
+    "flower/models/flower.py": "1a1b6b05fd895ebcc0d3bfffcdad20c804ee72499a26cec8921afe0ff25fc6ee",
+    "flower/models/networks/force_history.py": "7c879c5094923471f94726174bf3eb0856c40db99b8e866e34445f945310b744"
+  }
+}

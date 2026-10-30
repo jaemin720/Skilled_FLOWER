@@ -39,6 +39,10 @@ force_history_hidden_dim: 128
 force_history_gru_layers: 1
 force_history_dropout: 0.0
 force_history_length: null
+# Legacy sum conditioning remains the default for existing checkpoints/configs.
+force_history_latent_dim: 128
+adaln_conditioning_type: sum
+adaln_conditioning_hidden_dim: null
 
 # DiT Configuration
 sampling_type: uniform

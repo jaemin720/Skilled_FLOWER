@@ -21,15 +21,23 @@ class TrainingStatus(Callback):
         self.initial_weight_version = None
         self.last_loss = None
 
+    @staticmethod
+    def _recurrent_weight(module):
+        encoder = getattr(module, "force_history_encoder", None)
+        weight = getattr(encoder, "recurrent_weight", None)
+        if weight is not None:
+            return weight
+        gru = getattr(encoder, "gru", None)
+        return getattr(gru, "weight_ih_l0", None)
+
     def _write(self, trainer, module, state, **extra):
         if not trainer.is_global_zero:
             return
         device = module.device
-        encoder = getattr(module, "force_history_encoder", None)
-        gru = getattr(encoder, "gru", None)
+        weight = self._recurrent_weight(module)
         changed = None
-        if gru is not None and self.initial_weight_version is not None:
-            changed = gru.weight_ih_l0._version - self.initial_weight_version
+        if weight is not None and self.initial_weight_version is not None:
+            changed = weight._version - self.initial_weight_version
         scaler = getattr(trainer.precision_plugin, "scaler", None)
         record = {
             "state": state,
@@ -58,9 +66,9 @@ class TrainingStatus(Callback):
 
     def on_train_start(self, trainer, pl_module):
         self.started = time.monotonic()
-        gru = getattr(getattr(pl_module, "force_history_encoder", None), "gru", None)
-        if gru is not None:
-            self.initial_weight_version = gru.weight_ih_l0._version
+        weight = self._recurrent_weight(pl_module)
+        if weight is not None:
+            self.initial_weight_version = weight._version
         self._write(trainer, pl_module, "running")
 
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):

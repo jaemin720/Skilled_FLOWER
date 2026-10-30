@@ -1,0 +1,12 @@
+defaults:
+  - config_default_sfm_unnormalized_state
+  - model/ft_fafmp
+  - _self_
+
+# The physical-state baseline's epochs, schedule and checkpoint cadence persist.
+# F/T remains standardized in this experiment as well.
+log_dir: /home/jack/Skilled_FLOWER/logs/default_sfm_unnormalized_state_fafmp
+
+logger:
+  name: flower_default_sfm_crop_v2_no_xy_unnormalized_state_fafmp
+  group: default_sfm_unnormalized_state_fafmp
