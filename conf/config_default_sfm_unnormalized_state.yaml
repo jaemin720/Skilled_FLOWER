@@ -1,0 +1,30 @@
+defaults:
+  - config_default_sfm
+  - _self_
+
+# Compare with the X/Y ablation using the same FLOWER pretrained initialization.
+# Stored physical state has 13 channels; the model receives the 11 below.
+proprio_dims: 11
+max_epochs: 40
+log_dir: /home/jack/Skilled_FLOWER/logs/default_sfm_unnormalized_state
+
+model:
+  lr_scheduler:
+    lr_scheduler:
+      # 1,041 optimizer steps/epoch with batch 64 on each of two GPUs.
+      total_steps: 41640
+
+datamodule:
+  proprioception_dims:
+    keep_indices: [[0, 1], [3, 13]]
+  datasets:
+    lang_dataset:
+      proprio_source: physical
+
+callbacks:
+  checkpoint:
+    every_n_epochs: 10
+
+logger:
+  name: flower_default_sfm_crop_v2_no_xy_unnormalized_state
+  group: default_sfm_unnormalized_state

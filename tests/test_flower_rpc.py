@@ -98,6 +98,22 @@ def test_policy_returns_full_checkpoint_horizon(bundle, observation):
         policy.predict(dict(observation, right_force_history=np.zeros((49, 6))))
 
 
+def test_physical_checkpoint_inverts_only_state_before_xy_selection(bundle, observation):
+    cfg = config([[0, 1], [3, 13]])
+    cfg.datamodule.datasets = {"lang_dataset": {"proprio_source": "physical"}}
+    coefficients = dict(method="standard", offset=np.arange(13).tolist(), scale=[2.] * 13)
+    bundle.stats["observations"] = {"robot_obs": coefficients}
+    model = CPUStub()
+    model.lowdim_obs_dim = 11
+    policy = rpc.FlowerRPCPolicy(model, cfg, bundle, {"usb": "Insert USB connector into USB port"}, device="cpu")
+    policy.reset("usb")
+    policy.predict(observation)
+    selected = [0, *range(3, 13)]
+    expected = (observation["robot_obs"] * 2 + np.arange(13, dtype=np.float32))[selected]
+    np.testing.assert_array_equal(model.batch["robot_obs"].numpy(), expected[None, None])
+    np.testing.assert_array_equal(model.batch["right_force_history"].numpy(), observation["right_force_history"][None, None])
+
+
 def test_strict_ema_loading():
     original = dict(a=torch.zeros(2), b=torch.zeros(1))
     ema = dict(a=torch.ones(2), b=torch.ones(1))

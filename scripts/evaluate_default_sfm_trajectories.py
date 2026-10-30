@@ -42,6 +42,7 @@ import torch
 from torchvision.transforms import Compose, Normalize
 
 from flower.utils.transforms import ScaleImageTensor
+from flower.datasets.sfm_proprioception import config_proprio_source, load_physical_proprio
 from preprocess.default_sfm.sfm_preprocessing import normalize
 
 
@@ -115,16 +116,19 @@ def image_transforms(cfg):
     return result
 
 
-def read_batch(root, frame_ids, instruction, keep_indices, transforms):
+def read_batch(root, frame_ids, instruction, keep_indices, transforms, physical_proprio=None):
     rows = []
     for frame_id in frame_ids:
         with np.load(root / "training" / f"episode_{frame_id:07d}.npz", allow_pickle=False) as stored:
             rows.append({key: stored[key].copy() for key in stored.files})
     stack = lambda key: np.stack([row[key] for row in rows])
     raw = {key: stack(key) for key in ("robot_obs", "rel_actions", "timestamp", "source_index")}
+    # Keep raw['robot_obs'] standardized for the existing report's physical
+    # decoding; select physical inputs only for the model when training used it.
+    model_state = raw["robot_obs"] if physical_proprio is None else np.array(physical_proprio[frame_ids])
     batch = {
         "rgb_obs": {},
-        "robot_obs": torch.from_numpy(raw["robot_obs"][:, keep_indices]).unsqueeze(1),
+        "robot_obs": torch.from_numpy(model_state[:, keep_indices]).unsqueeze(1),
         "right_force_history": torch.from_numpy(stack("right_force_history")).unsqueeze(1),
         "lang_text": [instruction] * len(rows),
     }
@@ -178,6 +182,7 @@ def load_cpu_model(options):
                  frozen_prompt_sha256=hashlib.sha256(model.prompt_embeds.detach().numpy().tobytes()).hexdigest(),
                  prompt_restoration="Original cached Florence constructor and training seed, before checkpoint load",
                  train_seed=int(cfg.seed), action_horizon=model.act_window_size,
+                 proprio_source=config_proprio_source(cfg),
                  sampling_steps=model.num_sampling_steps, proprio_dim=model.lowdim_obs_dim,
                  ft_history_length=model.force_history_length, cuda_initialized=False)
     del state, original, checkpoint
@@ -213,6 +218,7 @@ def replay_worker(worker_id, episodes, options):
         model, cfg, audit = load_cpu_model(options)
         write_json(output / "workers" / f"model_audit_{worker_id:02d}.json", audit)
         root = Path(cfg.root_data_dir)
+        physical_proprio = load_physical_proprio(root) if config_proprio_source(cfg) == "physical" else None
         statistics = json.loads((root / "normalization.json").read_text())
         transforms = image_transforms(cfg)
         keep = [i for a, b in cfg.datamodule.proprioception_dims.keep_indices for i in range(a, b)]
@@ -232,7 +238,7 @@ def replay_worker(worker_id, episodes, options):
                 for offset in range(0, count, options["batch_size"]):
                     frame_ids = list(range(episode["start_frame"] + offset,
                                            episode["start_frame"] + min(count, offset + options["batch_size"])))
-                    batch, raw = read_batch(root, frame_ids, episode["instruction"], keep, transforms)
+                    batch, raw = read_batch(root, frame_ids, episode["instruction"], keep, transforms, physical_proprio)
                     np.testing.assert_array_equal(raw["rel_actions"], extracted[frame_ids])
                     assert np.array_equal(raw["source_index"],
                                           episode["start"] + np.arange(offset, offset + len(frame_ids)))

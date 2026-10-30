@@ -8,6 +8,7 @@ import torch
 from torchvision.transforms import ColorJitter, Compose, Normalize
 
 from flower.datasets.disk_dataset import ExtendedDiskDataset
+from flower.datasets.sfm_proprioception import load_physical_proprio, validate_proprio_source
 from flower.utils.transforms import ScaleImageTensor
 
 
@@ -20,7 +21,8 @@ class SfmDiskDataset(ExtendedDiskDataset):
     loss mask. The final observation/action stays available in the last window.
     """
 
-    def __init__(self, *args, shared_color_jitter=True, allow_smoke_test=False, **kwargs):
+    def __init__(self, *args, shared_color_jitter=True, allow_smoke_test=False,
+                 proprio_source="normalized", **kwargs):
         dataset_dir = Path(kwargs["datasets_dir"])
         root = dataset_dir.parent
         self.contract = json.loads((root / "data_contract.json").read_text())
@@ -29,6 +31,8 @@ class SfmDiskDataset(ExtendedDiskDataset):
             raise ValueError("A complete production SFM dataset is required")
         if self.contract["schema"] != "flower_calvin_npz_sfm_v1":
             raise ValueError("Unsupported SFM data contract")
+        self.proprio_source = validate_proprio_source(proprio_source)
+        self.physical_proprio = load_physical_proprio(root) if self.proprio_source == "physical" else None
         if self.contract.get("prohibit_additional_crop", False):
             # Cropping/letterboxing is already complete. Restrict the loader
             # transforms to pixel scaling/normalization, including nested Compose.
@@ -87,6 +91,9 @@ class SfmDiskDataset(ExtendedDiskDataset):
 
     def _load_episode(self, idx, window_size):
         episode = super()._load_episode(idx, window_size)
+        if self.physical_proprio is not None:
+            start = int(self.episode_lookup[idx])
+            episode["robot_obs"] = np.array(self.physical_proprio[start:start + self.obs_seq_len], copy=True)
         if self.color_jitter is None:
             return episode
         keys = ("rgb_static", "rgb_gripper")

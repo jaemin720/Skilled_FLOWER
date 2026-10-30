@@ -52,3 +52,5 @@ datasets:
     force_history_key: right_force_history
     load_bbox: false
     shared_color_jitter: true
+    # 'physical' selects the exported unnormalized 13-D state; same angle wrapping.
+    proprio_source: normalized

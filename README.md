@@ -114,6 +114,28 @@ bash train_default_sfm.sh proprio_dims=9 \
 
 `config_default_sfm_no_xy` retains `gripper,z,roll,pitch,yaw,vx,vy,vz,wx,wy,wz` in that order and sets both the dataset and model input width to 11. It starts a separate run from the same base FLOWER pretrained weights. Batch size (64 per GPU), GPUs 0/1, seed 42, 20 epochs, the 20,820-step LR schedule, 10-action chunks, F/T history, image transforms, and five-epoch checkpoint interval match the 13-D experiment. Delta X/Y action targets and X/Y velocities are retained. Dataset files and normalization statistics are shared without reprocessing.
 
+Unnormalized proprioception is also available under `datasets/default_sfm_crop_v2/unnormalized_proprio/`. These arrays were copied directly from Kingston's pre-normalization HDF5 intermediates, preserving the same 450 episodes and 137,239 retained frames. Row `i` corresponds to `training/episode_{i:07d}.npz`. The original NPZ files remain standardized.
+
+| File | Shape / meaning |
+| --- | --- |
+| `robot_obs.npy` | float32 `[137239,13]`; gripper, XYZ, RPY, velocity, without mean/std normalization; existing roll/yaw wrapping retained |
+| `source_state.npy` | float32 `[137239,19]`; original observed state including F/T, with original signed angles |
+| `source_index.npy`, `timestamp.npy` | Original within-demo step index and recorded time for each retained row |
+| `ep_start_end_ids.npy`, `manifest.json` | Inclusive demo boundaries, column definitions, source dataset hashes, and exported array checksums |
+
+The identical export on Kingston is `/media/csilab/robot_data/preprocessed/flower_default_sfm_crop_v2_20261028/dataset/unnormalized_proprio/`. All exported arrays together occupy about 19.8 MB. `scripts/export_default_sfm_proprioception.py` recreates the export from the existing `physical/*.h5` files without reading images or raw pickles. Export validation checked every row against the original state selection and reproduced the fitted mean/std; local checks verified transferred hashes and first/last frame alignment in all 450 demos.
+
+To explicitly start a new training run with physical proprioception and X/Y excluded (11 model channels):
+
+```bash
+bash train_default_sfm.sh --config-name config_default_sfm_unnormalized_state
+# Optional: retain all 13 state channels instead.
+bash train_default_sfm.sh --config-name config_default_sfm_unnormalized_state \
+  proprio_dims=13 'datamodule.proprioception_dims.keep_indices=[[0,13]]'
+```
+
+This config starts fresh from `flower_vla_pret/360000_model_weights.pt`, sets `datamodule.datasets.lang_dataset.proprio_source=physical` and `keep_indices=[[0,1],[3,13]]`, and uses separate logs under `logs/default_sfm_unnormalized_state`. It trains for 40 epochs with batch 64 per GPU on GPUs 0/1 and a 41,640-step learning-rate schedule, saving checkpoints every 10 completed epochs (`epoch009.ckpt`, `epoch019.ckpt`, `epoch029.ckpt`, `epoch039.ckpt`). The general dataset default is `normalized`; `proprioception_dims.normalize=false` alone does not undo normalization already stored in NPZ files. Images, F/T, action normalization, and trimming follow the existing configuration. The CPU replay tool and RPC server read the saved `proprio_source` for each checkpoint. For a physical-state checkpoint, the unchanged Kingston client still sends the existing normalized wire format, and the server restores state units before channel selection. Existing checkpoints continue receiving standardized state. Exporting the arrays does not start training or robot evaluation.
+
 `scripts/evaluate_default_sfm_trajectories.py` evaluates a completed checkpoint entirely on CPU in FP32 and produces a trajectory PDF, per-episode prediction arrays/CSVs, and metrics. By default it uses EMA weights and three evenly spaced demonstrations per task. It verifies all EMA keys/shapes and recreates the training-time frozen prompt using the original cached Florence constructor and seed. The first action of each 10-action prediction is decoded against that observation's recorded TCP pose; it is not cumulatively integrated. Only complete training-window starts are evaluated. Inference uses the stored image crops without color jitter, extra cropping, or repeated state/F/T normalization. This is training-data observation replay, not a robot rollout or held-out evaluation.
 
 ```bash

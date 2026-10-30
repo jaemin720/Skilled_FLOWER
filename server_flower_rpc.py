@@ -2,8 +2,9 @@
 """FLOWER inference for the unchanged Real_Robo.env_rpc_client HTTP/NPZ API.
 
 The client sends cropped uint8 RGB, standardized state, and standardized F/T.
-This server applies only the saved model image transform and state selection,
-and returns normalized actions. The client performs the physical conversion.
+This server applies the saved image transform and proprioception configuration,
+and returns normalized actions. A physical-state checkpoint restores state
+units before channel selection. The client performs the action conversion.
 Importing this module never loads model weights or starts a server.
 """
 import argparse
@@ -16,6 +17,7 @@ from pathlib import Path
 import time
 
 import numpy as np
+from flower.datasets.sfm_proprioception import config_proprio_source, physical_from_normalized
 
 from deployment.default_sfm.reference.Real_Robo.env_rpc_server import (
     InferenceBundle, bundle_id, serve_policy, validate_observation,
@@ -112,6 +114,7 @@ class FlowerRPCPolicy:
         self.model, self.bundle, self.instructions = model, bundle, instructions
         self.device = torch.device(device)
         self.precision = precision
+        self.proprio_source = config_proprio_source(config)
         self.indices = state_indices(config)
         self.transforms = image_transforms(config)
         self.horizon, self.action_dim = int(model.act_window_size), int(model.action_dim)
@@ -141,6 +144,11 @@ class FlowerRPCPolicy:
         if self.instruction is None:
             raise ValueError("Call /reset with a task instruction before /query")
         observation = validate_observation(self.bundle, observation)
+        if self.proprio_source == "physical":
+            # Keep the original robot client and wire bundle. Restore only state
+            # here, before selecting the checkpoint's 13/11/9 model channels.
+            observation = dict(observation, robot_obs=physical_from_normalized(
+                observation["robot_obs"], self.bundle.stats["observations"]["robot_obs"]))
         batch = observation_batch(observation, self.instruction, self.indices, self.transforms)
         started = time.monotonic()
         # Match training's mixed precision. Internal frequency/time tensors and
@@ -200,6 +208,7 @@ def load_policy(args, bundle, bundle_manifest):
                  action_horizon=model.act_window_size, proprio_dim=model.lowdim_obs_dim,
                  ft_history_length=model.force_history_length, device=str(device), precision=args.precision,
                  parameter_dtype="float32", training_config_sha256=sha256(config_path),
+                 proprio_source=config_proprio_source(config),
                  bundle_id=bundle_id(bundle))
     model.requires_grad_(False).eval().to(device=device, dtype=torch.float32)
     model.prompt_embeds = model.prompt_embeds.to(device=device, dtype=torch.float32)
