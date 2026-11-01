@@ -1,0 +1,88 @@
+{
+  "results": [
+    {
+      "source": "current",
+      "device": "cpu",
+      "config": "config_default_sfm_skill_current",
+      "checkpoint": {
+        "path": "/home/jack/Quest_SFM/flower_id2430_code/artifacts/research/flower_stage2_20261030/stageII/final.pt",
+        "sha256": "0701c0938af1167deb906e4705d34e8d6693d940c0c2fe4d18f10c7d3a3411ce",
+        "complete": true,
+        "stage": 1,
+        "completed_epochs": 101,
+        "steps": 97364,
+        "training_seed": 0,
+        "config_hash": "7637af0cb50d4b6bb11db9d6b1e80801597ecf1d7a3e48668b407704cfe5e4e9",
+        "quest_source": "/home/jack/Quest_SFM/flower_id2430_code/artifacts/research/seeds_64_302_source_20260930/quest",
+        "model_class": "research_addenda.id700_power.policy.PowerPriorPolicy",
+        "clip_snapshot": "/home/jack/Quest_SFM/clip-vit-base-patch32",
+        "task_names": [
+          "audio_jack",
+          "barlatch",
+          "bnc",
+          "hdmi",
+          "knob",
+          "lan",
+          "outlet",
+          "rotary_switch",
+          "usb"
+        ]
+      },
+      "samples": [
+        40,
+        0
+      ],
+      "skill_shape": [
+        2,
+        8,
+        4
+      ],
+      "action_shape": [
+        2,
+        10,
+        7
+      ],
+      "native_skill_exact_match": true,
+      "frozen_weights_unchanged": true,
+      "skill_calls_per_flow_sample": 1,
+      "backward_checked": true,
+      "loss": 30.618450164794922,
+      "quest_weights_sha256": "fca5f7101a4d799690a2dba217f488653c8bbfa3dd45a33e14830b3ae9bdd72d"
+    },
+    {
+      "source": "history",
+      "device": "cpu",
+      "config": "config_default_sfm_skill_history",
+      "checkpoint": {
+        "path": "/home/jack/Quest_SFM/flower_id2430_code/artifacts/research/flower_stage2_20261030/stageII/final.pt",
+        "sha256": "0701c0938af1167deb906e4705d34e8d6693d940c0c2fe4d18f10c7d3a3411ce",
+        "complete": true,
+        "stage": 1,
+        "completed_epochs": 101,
+        "steps": 97364,
+        "training_seed": 0,
+        "config_hash": "7637af0cb50d4b6bb11db9d6b1e80801597ecf1d7a3e48668b407704cfe5e4e9"
+      },
+      "samples": [
+        40,
+        0
+      ],
+      "skill_shape": [
+        2,
+        8,
+        4
+      ],
+      "action_shape": [
+        2,
+        10,
+        7
+      ],
+      "native_skill_exact_match": true,
+      "frozen_weights_unchanged": true,
+      "skill_calls_per_flow_sample": 1,
+      "backward_checked": true,
+      "loss": 17.047443389892578,
+      "quest_weights_sha256": "72557bc0d54a36ac2c8b89a4b4ddedbdc6a16d2b82cde6873940fbb5fe18f27c"
+    }
+  ]
+}

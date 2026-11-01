@@ -1,0 +1,19 @@
+{
+  "state": "failed",
+  "updated_at": "2026-10-30T21:10:21.698564+00:00",
+  "epoch": 1,
+  "global_step": 1,
+  "steps_per_epoch": 1041,
+  "max_epochs": 30,
+  "loss": null,
+  "learning_rates": [
+    2.0000000000000003e-06,
+    2.0000000000000003e-06
+  ],
+  "amp_scale": 65536.0,
+  "gru_weight_version_change": 2,
+  "elapsed_seconds": 6.524333783425391,
+  "gpu_allocated_gib": 18.87034797668457,
+  "gpu_peak_allocated_gib": 77.58872127532959,
+  "error": "RuntimeError: result type Float can't be cast to the desired output type Int"
+}

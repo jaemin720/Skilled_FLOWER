@@ -24,7 +24,7 @@ from deployment.default_sfm.reference.Real_Robo.env_rpc_server import (
 )
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_CHECKPOINT = ROOT / "logs/default_sfm/runs/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt"
+DEFAULT_CHECKPOINT = Path("/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt")
 LOG = logging.getLogger("flower_rpc")
 
 

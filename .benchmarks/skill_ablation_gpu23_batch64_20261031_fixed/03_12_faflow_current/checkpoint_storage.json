@@ -1,0 +1,8 @@
+{
+  "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/03_12_faflow_current",
+  "checkpoint_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/03_12_faflow_current/checkpoints",
+  "training_config": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/03_12_faflow_current/checkpoints/.hydra/config.yaml",
+  "local_checkpoint_path": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/03_12_faflow_current/seed_42/saved_models",
+  "local_path_points_to_storage": true,
+  "explicit_dirpath": true
+}

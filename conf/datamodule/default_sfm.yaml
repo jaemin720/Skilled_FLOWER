@@ -54,3 +54,5 @@ datasets:
     shared_color_jitter: true
     # 'physical' selects the exported unnormalized 13-D state; same angle wrapping.
     proprio_source: normalized
+    load_skill_history: false
+    load_quest_observations: false

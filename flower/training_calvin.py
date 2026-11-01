@@ -16,6 +16,7 @@ from pytorch_lightning.utilities import rank_zero_only
 sys.path.insert(0, Path(__file__).absolute().parents[1].as_posix())
 import flower.models.flower as models_m
 from flower.utils.utils import get_git_commit_hash, get_last_checkpoint, initialize_pretrained_weights, print_system_env_info
+from flower.utils.checkpoint_storage import prepare_checkpoint_storage
 
 # Add local repo to path
 sys.path.insert(0, str(Path(__file__).absolute().parents[1]))
@@ -73,6 +74,11 @@ def train(cfg: DictConfig) -> None:
         
         # Initialize components
         log_rank_0(f"\nInitializing training for seed {cfg.seed}")
+        checkpoint_dir = prepare_checkpoint_storage(
+            cfg, Path.cwd(), write_metadata=rank_zero_only.rank == 0,
+        )
+        if checkpoint_dir is not None:
+            log_rank_0(f"Checkpoint output directory: {checkpoint_dir}")
         datamodule = hydra.utils.instantiate(cfg.datamodule)
         resume_checkpoint = cfg.get("resume_from_checkpoint")
         if resume_checkpoint:

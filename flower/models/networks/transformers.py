@@ -201,7 +201,9 @@ class FlowerAttention(nn.Module):
             attn_mask=None if mask is None else ~mask,
             dropout_p=self.attn_dropout.p if self.training else 0.0,
             scale=self.scale,
-            is_causal=is_causal if custom_attn_mask is None else False
+            # The explicit mask above already includes causality. The math
+            # backend (e.g. training with dropout on CPU) rejects both at once.
+            is_causal=is_causal and mask is None
         )
         out = attn_output.transpose(1, 2).reshape(B, T, C)
         out = self.resid_dropout(self.proj(out))

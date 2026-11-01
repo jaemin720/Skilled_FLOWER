@@ -1,0 +1,80 @@
+{
+  "passed": true,
+  "verified_at": "2026-10-29T11:31:23.541289+00:00",
+  "files": 7,
+  "moved_gib": 87.44805523380637,
+  "storage_root": "/data/jack/Skilled_FLOWER/checkpoints",
+  "compatibility_links_verified": true,
+  "checkpoint_metadata_verified": true,
+  "model_instantiated": false,
+  "inference_started": false,
+  "gpu_initialized": false,
+  "rpc_adapter_tests_passed": 7,
+  "home_free_gib": 254.24178314208984,
+  "data_free_gib": 1086.7784156799316,
+  "checkpoints": [
+    {
+      "checkpoint": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/seed_42/saved_models/epoch029.ckpt",
+      "training_config": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/.hydra/config.yaml",
+      "completed_epochs": 30,
+      "global_step": 31230,
+      "proprio_dim": 13,
+      "ema_tensors": 924,
+      "sha256": "6f664a62cae0f148226009e85b7a55023696a598703682932a62a67579c73bdf"
+    },
+    {
+      "checkpoint": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/seed_42/saved_models/epoch034.ckpt",
+      "training_config": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/.hydra/config.yaml",
+      "completed_epochs": 35,
+      "global_step": 36435,
+      "proprio_dim": 13,
+      "ema_tensors": 924,
+      "sha256": "af8976277c6feff6213a1f2093ff04b6238a4c835aa59a272517b49e859be869"
+    },
+    {
+      "checkpoint": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch014.ckpt",
+      "training_config": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/.hydra/config.yaml",
+      "completed_epochs": 15,
+      "global_step": 15615,
+      "proprio_dim": 13,
+      "ema_tensors": 924,
+      "sha256": "186fd2680d3ce7c668c752d0ccebe5e53c2114c09e661dccd947d16762826392"
+    },
+    {
+      "checkpoint": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt",
+      "training_config": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/.hydra/config.yaml",
+      "completed_epochs": 20,
+      "global_step": 20820,
+      "proprio_dim": 13,
+      "ema_tensors": 924,
+      "sha256": "6272cd91a764003f4c58db7e31ee93d6e259fe99380678b95effc14109a403c7"
+    },
+    {
+      "checkpoint": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/saved_models/epoch019.ckpt",
+      "training_config": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/.hydra/config.yaml",
+      "completed_epochs": 20,
+      "global_step": 20820,
+      "proprio_dim": 11,
+      "ema_tensors": 924,
+      "sha256": "e8de028e6e76312000482e0bf5e29e127aa6660edbb93c9323451af6d8bbbd92"
+    },
+    {
+      "checkpoint": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/saved_models/epoch029.ckpt",
+      "training_config": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/.hydra/config.yaml",
+      "completed_epochs": 30,
+      "global_step": 31230,
+      "proprio_dim": 11,
+      "ema_tensors": 924,
+      "sha256": "29d7ca8782f4df229a815d44a8e537b997f8a8b8769951ce10b1d19874149385"
+    },
+    {
+      "checkpoint": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/saved_models/epoch039.ckpt",
+      "training_config": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/.hydra/config.yaml",
+      "completed_epochs": 40,
+      "global_step": 41640,
+      "proprio_dim": 11,
+      "ema_tensors": 924,
+      "sha256": "fc0ee8c2bc49429094dc73009879bc9159a31ce33c829a57008d733b9ac01909"
+    }
+  ]
+}

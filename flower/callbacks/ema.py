@@ -99,7 +99,11 @@ class EMA(Callback):
         self._overflow_buf = torch.IntTensor([0]).to(pl_module.device)
 
     def ema(self, pl_module: "pl.LightningModule") -> None:
-        if apex_available and pl_module.device.type == "cuda":
+        # Apex's fused kernel only accepts floating weights. Quest also has
+        # integer/bool buffers (e.g. FSQ levels); use the typed fallback for it.
+        if (apex_available and pl_module.device.type == "cuda"
+                and all(weight.dtype in (torch.float16, torch.float32)
+                        for weight in pl_module.state_dict().values())):
             return self.apply_multi_tensor_ema(pl_module)
         return self.apply_ema(pl_module)
 
@@ -117,8 +121,9 @@ class EMA(Callback):
     def apply_ema(self, pl_module: "pl.LightningModule") -> None:
         decay = self.get_decay(self._cur_step)
         for orig_weight, ema_weight in zip(list(pl_module.state_dict().values()), self._ema_model_weights):
-            if orig_weight.dtype == torch.uint8 or orig_weight.dtype == torch.int64:
-                ema_weight.data = orig_weight.data.clone()
+            if not (orig_weight.is_floating_point() or orig_weight.is_complex()):
+                # Discrete model state must be copied exactly, never averaged.
+                ema_weight.copy_(orig_weight)
             else:
                 diff = ema_weight.data - orig_weight.data
                 diff.mul_(1.0 - decay)

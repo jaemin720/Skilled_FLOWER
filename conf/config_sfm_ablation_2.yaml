@@ -1,0 +1,12 @@
+defaults:
+  - config_sfm_ablation_base
+  - _self_
+experiment_components: [2]
+model:
+  skill_source: current
+datamodule:
+  datasets:
+    lang_dataset:
+      load_quest_observations: true
+logger:
+  name: gru_current_skill

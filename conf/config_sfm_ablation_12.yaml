@@ -1,0 +1,13 @@
+defaults:
+  - config_sfm_ablation_base
+  - model/ft_fafmp
+  - _self_
+experiment_components: [1, 2]
+model:
+  skill_source: current
+datamodule:
+  datasets:
+    lang_dataset:
+      load_quest_observations: true
+logger:
+  name: faflow_current_skill

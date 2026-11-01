@@ -1,0 +1,36 @@
+defaults:
+  - config_default_sfm_unnormalized_state
+  - _self_
+
+# Shared baseline: physical 11-D state (X/Y removed), existing data and GRU F/T.
+# Component 1 overrides GRU + sum with the FAFMP Swish GRU + concat MLP path.
+experiment_components: []
+max_epochs: 30
+devices: 2
+batch_size: 64
+log_dir: /home/jack/Skilled_FLOWER/logs/skill_ablation_queue
+checkpoint_root: /data/jack/Skilled_FLOWER/checkpoints
+quest_project_root: ${oc.env:QUEST_SFM_ROOT,/home/jack/Quest_SFM/flower_id2430_code}
+quest_clip_snapshot: ${oc.env:QUEST_CLIP_SNAPSHOT,/home/jack/Quest_SFM/clip-vit-base-patch32}
+
+model:
+  quest_project_root: ${quest_project_root}
+  quest_checkpoint_path: ${quest_project_root}/artifacts/research/flower_stage2_20261030/stageII/final.pt
+  quest_clip_snapshot: ${quest_clip_snapshot}
+  skill_cond_pool: mean
+  lr_scheduler:
+    lr_scheduler:
+      total_steps: 31230  # 1041 updates/epoch * 30 epochs; global batch 128.
+
+callbacks:
+  checkpoint:
+    every_n_epochs: 10
+    save_last: false
+    save_top_k: -1
+    monitor: null
+    filename: 'epoch{epoch:03d}'
+    auto_insert_metric_name: false
+
+logger:
+  project: flower_sfm_skill_ablation
+  offline: true

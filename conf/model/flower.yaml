@@ -44,6 +44,13 @@ force_history_latent_dim: 128
 adaln_conditioning_type: sum
 adaln_conditioning_hidden_dim: null
 
+# Frozen Quest_SFM ID2430 skills. Existing experiments remain disabled.
+skill_source: none  # none | current (Stage-II prior) | history (action encoder) | both
+quest_project_root: null
+quest_checkpoint_path: null
+quest_clip_snapshot: null
+skill_cond_pool: mean
+
 # DiT Configuration
 sampling_type: uniform
 dit_dim: 1024

@@ -1,0 +1,32 @@
+{
+  "stage1": "/home/jack/Quest_SFM/flower_id2430_code/artifacts/research/flower_stage1_20261029/stageI/final.pt",
+  "stage2": "/home/jack/Quest_SFM/flower_id2430_code/artifacts/research/flower_stage2_20261030/stageII/final.pt",
+  "stage1_complete": true,
+  "stage2_complete": true,
+  "stage1_stage": 0,
+  "stage2_stage": 1,
+  "autoencoder_tensor_count": 119,
+  "autoencoder_elements": 6522895,
+  "keys_equal": true,
+  "different_tensors": [],
+  "stage1_autoencoder_sha256": "20ef69601ec9211249155e7f3b3d7ac9ae19bdfc41cef79e641927ebed86c6bd",
+  "stage2_autoencoder_sha256": "20ef69601ec9211249155e7f3b3d7ac9ae19bdfc41cef79e641927ebed86c6bd",
+  "autoencoder_config_equal": true,
+  "verified_at": "2026-10-31T08:06:11.743158+00:00",
+  "stage1_file_sha256": "dc004f8da01336938c38aeeffb3c9ee21c592794ba3dd8542ac0857cabd66714",
+  "stage1_file_matches_handoff": true,
+  "running_experiment": {
+    "components": [
+      1,
+      3
+    ],
+    "checkpoint": "/data/jack/Skilled_FLOWER/checkpoints/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/01_13_faflow_history/seed_42/saved_models/epoch019.ckpt",
+    "global_step": 20820,
+    "completed_epochs": 20,
+    "tensors_compared": 119,
+    "raw_autoencoder_identical_to_stage1": true,
+    "ema_autoencoder_identical_to_stage1": true,
+    "different_raw_tensors": [],
+    "different_ema_tensors": []
+  }
+}

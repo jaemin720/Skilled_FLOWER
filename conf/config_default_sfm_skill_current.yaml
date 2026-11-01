@@ -1,0 +1,23 @@
+defaults:
+  - config_default_sfm
+  - _self_
+
+quest_project_root: ${oc.env:QUEST_SFM_ROOT,/home/jack/Quest_SFM/flower_id2430_code}
+quest_clip_snapshot: ${oc.env:QUEST_CLIP_SNAPSHOT,/home/jack/Quest_SFM/clip-vit-base-patch32}
+log_dir: /home/jack/Skilled_FLOWER/logs/default_sfm_skill_current
+
+model:
+  skill_source: current
+  quest_project_root: ${quest_project_root}
+  quest_checkpoint_path: ${quest_project_root}/artifacts/research/flower_stage2_20261030/stageII/final.pt
+  quest_clip_snapshot: ${quest_clip_snapshot}
+  skill_cond_pool: mean
+
+datamodule:
+  datasets:
+    lang_dataset:
+      load_quest_observations: true
+
+logger:
+  name: flower_default_sfm_skill_current
+  group: default_sfm_skill_current

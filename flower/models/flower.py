@@ -22,6 +22,7 @@ from transformers import AutoModelForCausalLM, AutoProcessor, AutoConfig
 from flower.models.networks.force_history import (
     GRUHistoryEncoder, FAFMPGRUHistoryEncoder, FAFMPConditioningMLP,
 )
+from flower.models.networks.quest_skill import FrozenQuestSkill, prepare_action_history
 from flower.models.networks.transformers import (
     TimestepEmbedder,
     SharedAdaLNController,
@@ -163,10 +164,22 @@ class FLOWERVLA(pl.LightningModule):
         force_history_latent_dim: int = 128,
         adaln_conditioning_type: str = "sum",
         adaln_conditioning_hidden_dim: Optional[int] = None,
+        # Frozen Quest_SFM ID2430: current observation prior or past-action AE.
+        skill_source: str = "none",
+        quest_project_root: Optional[str] = None,
+        quest_checkpoint_path: Optional[str] = None,
+        quest_clip_snapshot: Optional[str] = None,
+        skill_cond_pool: str = "mean",
         **kwargs,
     ):
         super().__init__()
         self.save_hyperparameters()
+        if skill_source not in ("none", "current", "history", "both"):
+            raise ValueError("skill_source must be 'none', 'current', 'history' or 'both'")
+        if skill_cond_pool not in ("mean", "last"):
+            raise ValueError("skill_cond_pool must be 'mean' or 'last'")
+        self.skill_source = skill_source
+        self.skill_cond_pool = skill_cond_pool
         # self.automatic_optimization = False
         self.action_space_index = ActionIndex()
         # Initialize model flags and configurations
@@ -247,6 +260,18 @@ class FLOWERVLA(pl.LightningModule):
         )
 
         # Initialize state tracking
+        self.quest_skill = None
+        self.skill_proj = None
+        self.history_skill_proj = None
+        if self.skill_source != "none":
+            self.quest_skill = FrozenQuestSkill(
+                skill_source, quest_project_root, quest_checkpoint_path, quest_clip_snapshot,
+            )
+            # Original Skilled_FLOWER: pool actual skill tokens, then LN + Linear.
+            self.skill_proj = nn.Sequential(nn.LayerNorm(4), nn.Linear(4, dit_dim))
+            if self.skill_source == "both":
+                self.history_skill_proj = nn.Sequential(nn.LayerNorm(4), nn.Linear(4, dit_dim))
+        self.skill_action_history = None
         self.rollout_step_counter = 0
         self.pred_action_seq = None
         self.modality_scope = "lang"
@@ -925,6 +950,19 @@ class FLOWERVLA(pl.LightningModule):
             else:
                 global_cond = t_emb
         
+        if self.skill_source != "none":
+            skill_embeds = cond_dict.get("skill_embeds")
+            if skill_embeds is None or skill_embeds.shape != (B, self.dit_dim):
+                raise ValueError("Skill conditioning requires skill_embeds from encode_observations()")
+            # Same addition as upstream, used by shared AND per-block AdaLN.
+            # With FAFMP, add to the fused base condition without changing its MLP.
+            global_cond = global_cond + stateless_norm(skill_embeds.to(global_cond))
+            if self.skill_source == "both":
+                history_embeds = cond_dict.get("history_skill_embeds")
+                if history_embeds is None or history_embeds.shape != (B, self.dit_dim):
+                    raise ValueError("Combined Skill conditioning requires history_skill_embeds")
+                global_cond = global_cond + stateless_norm(history_embeds.to(global_cond))
+
         # Setup context
         cx = z
         context = cond if self.use_cross_attn else None
@@ -1015,6 +1053,20 @@ class FLOWERVLA(pl.LightningModule):
         
         
         batch_size = len(batch["rgb_obs"]['rgb_static'])
+        skill_embeds = None
+        history_skill_embeds = None
+        if self.quest_skill is not None:
+            # Generate once per observation, reused across every action flow step.
+            skill = self.quest_skill(batch, batch_size)
+            if self.skill_source == "both":
+                history = skill["history"]
+                history_pooled = history.mean(dim=1) if self.skill_cond_pool == "mean" else history[:, -1]
+                history_skill_embeds = self.history_skill_proj(
+                    history_pooled.to(next(self.history_skill_proj.parameters())),
+                )
+                skill = skill["current"]
+            pooled = skill.mean(dim=1) if self.skill_cond_pool == "mean" else skill[:, -1]
+            skill_embeds = self.skill_proj(pooled.to(next(self.skill_proj.parameters())))
         force_history_embeds = None
         if self.use_force_history_adaln:
             force_history_embeds = self.encode_force_history(
@@ -1090,6 +1142,8 @@ class FLOWERVLA(pl.LightningModule):
             'proprio': proprio,
             'right_force_history': batch.get("right_force_history", None),
             'force_history_embeds': force_history_embeds,
+            'skill_embeds': skill_embeds,
+            'history_skill_embeds': history_skill_embeds,
             'attention_mask': attention_mask,
         }
 
@@ -1163,6 +1217,9 @@ class FLOWERVLA(pl.LightningModule):
                 batch["robot_obs"] = robot_obs_raw
         if "right_force_history" in obs:
             batch["right_force_history"] = obs["right_force_history"]
+        for key in ("skill_prev_actions", "skill_prev_valid_mask", "quest_rgb_static", "quest_rgb_gripper", "quest_robot_obs"):
+            if key in obs:
+                batch[key] = obs[key]
         features = self.encode_observations(batch)
         # Generate initial noise
         noise = torch.randn(
@@ -1186,6 +1243,23 @@ class FLOWERVLA(pl.LightningModule):
         Returns:
             Current action prediction
         """
+        if self.skill_source in ("history", "both"):
+            if obs["rgb_obs"]["rgb_static"].shape[0] != 1:
+                raise ValueError("step() tracks one rollout; use forward() with explicit batched histories")
+            if "skill_prev_actions" in obs:
+                self.skill_action_history = prepare_action_history(
+                    obs["skill_prev_actions"], 1, self.device, next(self.parameters()).dtype,
+                    padding_action=self.quest_skill.history_padding_action,
+                    valid_mask=obs.get("skill_prev_valid_mask"),
+                )
+            elif self.return_act_chunk:
+                raise KeyError("Chunk rollout requires explicit 'skill_prev_actions' from executed actions")
+            elif self.skill_action_history is None:
+                self.skill_action_history = torch.empty(1, 0, 7, device=self.device)
+            obs = dict(obs, skill_prev_actions=self.skill_action_history)
+            # Explicit masks were consumed above, before canonicalizing to 32
+            # slots. Their original length need not match the padded history.
+            obs.pop("skill_prev_valid_mask", None)
         if self.rollout_step_counter % self.multistep == 0:
             self.pred_action_seq = self(obs, goal)
         
@@ -1198,6 +1272,18 @@ class FLOWERVLA(pl.LightningModule):
             # Return whole chunk for ALOHA setups
             current_action = self.pred_action_seq
 
+        if self.skill_source in ("history", "both") and not self.return_act_chunk:
+            # step() assumes each returned action is executed. Direct/chunk callers
+            # must supply their actual executed action history in forward().
+            action = current_action.detach().reshape(1, 1, 7)
+            history = self.skill_action_history
+            if history is None:
+                history = action.new_empty(1, 0, 7)
+            self.skill_action_history = prepare_action_history(
+                torch.cat((history.to(action), action), dim=1), 1, action.device, action.dtype,
+                padding_action=self.quest_skill.history_padding_action,
+            )
+
         self.rollout_step_counter += 1
         if self.rollout_step_counter == self.multistep:
             self.rollout_step_counter = 0
@@ -1208,6 +1294,7 @@ class FLOWERVLA(pl.LightningModule):
         """Reset model state for new rollout."""
         self.rollout_step_counter = 0
         self.pred_action_seq = None
+        self.skill_action_history = None
         self.eval()
 
     def on_train_start(self):

@@ -1,0 +1,461 @@
+{
+  "request": {
+    "created_at": "2026-10-30T21:12:45.146190+00:00",
+    "physical_gpus": [
+      2,
+      3
+    ],
+    "per_gpu_batch_size": 64,
+    "global_batch_size": 128,
+    "steps": 10,
+    "production_plan": "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/plan.json",
+    "production_gpus": [
+      0,
+      1
+    ],
+    "source_manifest": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/source_manifest.json",
+    "commands": [
+      {
+        "name": "01_13_faflow_history",
+        "config": "config_sfm_ablation_13",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/01_13_faflow_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_13",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/01_13_faflow_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/01_13_faflow_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/01_13_faflow_history/checkpoints"
+        ]
+      },
+      {
+        "name": "02_123_faflow_current_history",
+        "config": "config_sfm_ablation_123",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/02_123_faflow_current_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_123",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/02_123_faflow_current_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/02_123_faflow_current_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/02_123_faflow_current_history/checkpoints"
+        ]
+      },
+      {
+        "name": "03_12_faflow_current",
+        "config": "config_sfm_ablation_12",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/03_12_faflow_current",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_12",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/03_12_faflow_current",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/03_12_faflow_current",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/03_12_faflow_current/checkpoints"
+        ]
+      },
+      {
+        "name": "04_3_gru_history",
+        "config": "config_sfm_ablation_3",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/04_3_gru_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_3",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/04_3_gru_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/04_3_gru_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/04_3_gru_history/checkpoints"
+        ]
+      },
+      {
+        "name": "05_23_gru_current_history",
+        "config": "config_sfm_ablation_23",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/05_23_gru_current_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_23",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/05_23_gru_current_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/05_23_gru_current_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/05_23_gru_current_history/checkpoints"
+        ]
+      },
+      {
+        "name": "06_2_gru_current",
+        "config": "config_sfm_ablation_2",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/06_2_gru_current",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_2",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/06_2_gru_current",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/06_2_gru_current",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/06_2_gru_current/checkpoints"
+        ]
+      }
+    ]
+  },
+  "state": "passed",
+  "started_at": "2026-10-30T21:12:45.146541+00:00",
+  "results": [
+    {
+      "name": "01_13_faflow_history",
+      "config": "config_sfm_ablation_13",
+      "state": "passed",
+      "started_at": "2026-10-30T21:12:45.529070+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 89843,
+        "3": 89843
+      },
+      "pid": 3315248,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:13:24.415886+00:00",
+        "epoch": 2,
+        "global_step": 10,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 0.6940533518791199,
+        "learning_rates": [
+          2.103779628443306e-06,
+          2.103779628443306e-06
+        ],
+        "amp_scale": 65536.0,
+        "gru_weight_version_change": 20,
+        "elapsed_seconds": 16.154803302139044,
+        "gpu_allocated_gib": 18.798410415649414,
+        "gpu_peak_allocated_gib": 86.62536716461182
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 51.98782452940941,
+      "ended_at": "2026-10-30T21:13:37.517356+00:00",
+      "checkpoints_saved": false
+    },
+    {
+      "name": "02_123_faflow_current_history",
+      "config": "config_sfm_ablation_123",
+      "state": "passed",
+      "started_at": "2026-10-30T21:13:38.054583+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 91133,
+        "3": 91133
+      },
+      "pid": 3316845,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:14:20.731509+00:00",
+        "epoch": 2,
+        "global_step": 10,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 1.2306631803512573,
+        "learning_rates": [
+          2.103779628443306e-06,
+          2.103779628443306e-06
+        ],
+        "amp_scale": 16384.0,
+        "gru_weight_version_change": 16,
+        "elapsed_seconds": 16.844007648527622,
+        "gpu_allocated_gib": 20.02875280380249,
+        "gpu_peak_allocated_gib": 87.87391376495361
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 56.541993118822575,
+      "ended_at": "2026-10-30T21:14:34.597084+00:00",
+      "checkpoints_saved": false
+    },
+    {
+      "name": "03_12_faflow_current",
+      "config": "config_sfm_ablation_12",
+      "state": "passed",
+      "started_at": "2026-10-30T21:14:35.065667+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 91131,
+        "3": 91131
+      },
+      "pid": 3318267,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:15:17.228766+00:00",
+        "epoch": 2,
+        "global_step": 10,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 0.9597954750061035,
+        "learning_rates": [
+          2.103779628443306e-06,
+          2.103779628443306e-06
+        ],
+        "amp_scale": 16384.0,
+        "gru_weight_version_change": 16,
+        "elapsed_seconds": 16.88184708263725,
+        "gpu_allocated_gib": 20.02814531326294,
+        "gpu_peak_allocated_gib": 87.8729887008667
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 56.50668536592275,
+      "ended_at": "2026-10-30T21:15:31.572921+00:00",
+      "checkpoints_saved": false
+    },
+    {
+      "name": "04_3_gru_history",
+      "config": "config_sfm_ablation_3",
+      "state": "passed",
+      "started_at": "2026-10-30T21:15:32.097466+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 89741,
+        "3": 89741
+      },
+      "pid": 3319700,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:16:10.134997+00:00",
+        "epoch": 2,
+        "global_step": 10,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 7.2559332847595215,
+        "learning_rates": [
+          2.103779628443306e-06,
+          2.103779628443306e-06
+        ],
+        "amp_scale": 1024.0,
+        "gru_weight_version_change": 8,
+        "elapsed_seconds": 15.698325721547008,
+        "gpu_allocated_gib": 18.702889442443848,
+        "gpu_peak_allocated_gib": 86.52241849899292
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 52.04966153483838,
+      "ended_at": "2026-10-30T21:16:24.147729+00:00",
+      "checkpoints_saved": false
+    },
+    {
+      "name": "05_23_gru_current_history",
+      "config": "config_sfm_ablation_23",
+      "state": "passed",
+      "started_at": "2026-10-30T21:16:24.692944+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 91031,
+        "3": 91031
+      },
+      "pid": 3321003,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:17:06.371579+00:00",
+        "epoch": 2,
+        "global_step": 10,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 14.888998031616211,
+        "learning_rates": [
+          2.103779628443306e-06,
+          2.103779628443306e-06
+        ],
+        "amp_scale": 512.0,
+        "gru_weight_version_change": 6,
+        "elapsed_seconds": 16.58234965801239,
+        "gpu_allocated_gib": 19.933231830596924,
+        "gpu_peak_allocated_gib": 87.77133131027222
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 53.975078666582704,
+      "ended_at": "2026-10-30T21:17:18.668677+00:00",
+      "checkpoints_saved": false
+    },
+    {
+      "name": "06_2_gru_current",
+      "config": "config_sfm_ablation_2",
+      "state": "passed",
+      "started_at": "2026-10-30T21:17:19.456221+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 91029,
+        "3": 91029
+      },
+      "pid": 3322649,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:18:01.739809+00:00",
+        "epoch": 2,
+        "global_step": 10,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 5.568699359893799,
+        "learning_rates": [
+          2.103779628443306e-06,
+          2.103779628443306e-06
+        ],
+        "amp_scale": 1024.0,
+        "gru_weight_version_change": 8,
+        "elapsed_seconds": 16.446324564516544,
+        "gpu_allocated_gib": 19.932624340057373,
+        "gpu_peak_allocated_gib": 87.7700400352478
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 56.44163224007934,
+      "ended_at": "2026-10-30T21:18:15.898662+00:00",
+      "checkpoints_saved": false
+    }
+  ],
+  "ended_at": "2026-10-30T21:18:16.175662+00:00",
+  "final_gpu_state": [
+    {
+      "index": 2,
+      "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+      "used_mib": 17,
+      "total_mib": 97887,
+      "utilization": 0
+    },
+    {
+      "index": 3,
+      "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+      "used_mib": 17,
+      "total_mib": 97887,
+      "utilization": 0
+    }
+  ]
+}

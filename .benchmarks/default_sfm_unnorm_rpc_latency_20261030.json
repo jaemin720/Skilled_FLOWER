@@ -1,0 +1,717 @@
+{
+  "observed_at": "2026-10-30T01:27:36.940740+00:00",
+  "active": "261755b353244e22adac8f4e334523fa",
+  "monitor_port": 8127,
+  "state": "resetting",
+  "writer_backlog": 0,
+  "episodes": [
+    {
+      "id": "261755b353244e22adac8f4e334523fa",
+      "status": "resetting",
+      "prompt": "Grasp knob and rotate clockwise",
+      "runtime": {
+        "disable_policy_rotation": false,
+        "lighting_correction": null,
+        "lighting_correction_path": null,
+        "relative_action_frame_yaw_deg": 0,
+        "relative_execution": null,
+        "relative_gripper_action_mode": "absolute",
+        "relative_gripper_progress": "timestep",
+        "relative_progress": "timestep",
+        "request_steps": 7,
+        "send_chunk_length": 1
+      },
+      "n_frames": 0,
+      "rpc_ms": {
+        "n": 0
+      },
+      "steady_rpc_ms": {
+        "n": 0
+      },
+      "first_rpc_ms": null,
+      "env_step_running_ms": {
+        "n": 0
+      },
+      "control_interval_running_ms": {
+        "n": 0
+      },
+      "query_interval_ms": {
+        "n": 0
+      },
+      "apply_after_response_ms": {
+        "n": 0
+      },
+      "phases": {},
+      "dropped_steps": {},
+      "chunk_lengths": {},
+      "rpc_errors": [],
+      "rpc_outliers": []
+    },
+    {
+      "id": "cc6b63837ce344e18d9bf3836e53e5a6",
+      "status": "finished",
+      "prompt": "Grasp knob and rotate clockwise",
+      "runtime": {
+        "disable_policy_rotation": false,
+        "lighting_correction": null,
+        "lighting_correction_path": null,
+        "relative_action_frame_yaw_deg": 0,
+        "relative_execution": null,
+        "relative_gripper_action_mode": "absolute",
+        "relative_gripper_progress": "timestep",
+        "relative_progress": "timestep",
+        "request_steps": 7,
+        "send_chunk_length": 1
+      },
+      "n_frames": 538,
+      "rpc_ms": {
+        "n": 68,
+        "mean": 113.88046601239373,
+        "p50": 113.62040042877197,
+        "p95": 119.41972970962524,
+        "p99": 121.03419780731201,
+        "max": 121.53482437133789
+      },
+      "steady_rpc_ms": {
+        "n": 67,
+        "mean": 113.8996722093269,
+        "p50": 113.7242317199707,
+        "p95": 119.47195529937744,
+        "p99": 121.04166984558105,
+        "max": 121.53482437133789
+      },
+      "first_rpc_ms": 112.5936508178711,
+      "env_step_running_ms": {
+        "n": 458,
+        "mean": 98.58230992696171,
+        "p50": 98.86670112609863,
+        "p95": 118.15330982208252,
+        "p99": 141.97397947311404,
+        "max": 151.80182456970215
+      },
+      "control_interval_running_ms": {
+        "n": 452,
+        "mean": 99.83545541763306,
+        "p50": 99.7849702835083,
+        "p95": 118.8841462135315,
+        "p99": 138.55493307113653,
+        "max": 152.10890769958496
+      },
+      "query_interval_ms": {
+        "n": 67,
+        "mean": 791.673934281762,
+        "p50": 701.549768447876,
+        "p95": 908.6089372634888,
+        "p99": 3250.8934736251895,
+        "max": 4499.401330947876
+      },
+      "apply_after_response_ms": {
+        "n": 67,
+        "mean": 76.32898216816916,
+        "p50": 76.61175727844238,
+        "p95": 96.77820205688475,
+        "p99": 111.09261512756348,
+        "max": 111.97066307067871
+      },
+      "phases": {
+        "waiting": 79,
+        "running": 458,
+        "final": 1
+      },
+      "dropped_steps": {
+        "0": 6,
+        "1": 1,
+        "2": 60,
+        "null": 1
+      },
+      "chunk_lengths": {
+        "10": 68
+      },
+      "rpc_errors": [],
+      "rpc_outliers": []
+    },
+    {
+      "id": "b0030aa4b7b8497d915ee61199de375a",
+      "status": "finished",
+      "prompt": "Grasp knob and rotate clockwise",
+      "runtime": {
+        "disable_policy_rotation": false,
+        "lighting_correction": null,
+        "lighting_correction_path": null,
+        "relative_action_frame_yaw_deg": 0,
+        "relative_execution": null,
+        "relative_gripper_action_mode": "absolute",
+        "relative_gripper_progress": "timestep",
+        "relative_progress": "timestep",
+        "request_steps": 7,
+        "send_chunk_length": 1
+      },
+      "n_frames": 311,
+      "rpc_ms": {
+        "n": 41,
+        "mean": 137.29566481055284,
+        "p50": 113.26289176940918,
+        "p95": 121.43468856811523,
+        "p99": 692.021989822389,
+        "max": 1058.264970779419
+      },
+      "steady_rpc_ms": {
+        "n": 40,
+        "mean": 114.27143216133118,
+        "p50": 113.25275897979736,
+        "p95": 117.83269643783568,
+        "p99": 134.38061475753784,
+        "max": 142.65751838684082
+      },
+      "first_rpc_ms": 1058.264970779419,
+      "env_step_running_ms": {
+        "n": 270,
+        "mean": 98.56195273222747,
+        "p50": 98.98233413696289,
+        "p95": 118.81816387176512,
+        "p99": 132.92425632476807,
+        "max": 144.72103118896484
+      },
+      "control_interval_running_ms": {
+        "n": 267,
+        "mean": 100.06052992317115,
+        "p50": 99.96700286865234,
+        "p95": 119.73795890808105,
+        "p99": 134.7969150543211,
+        "max": 145.87783813476562
+      },
+      "query_interval_ms": {
+        "n": 40,
+        "mean": 738.3819460868835,
+        "p50": 700.6773948669434,
+        "p95": 931.203567981719,
+        "p99": 1626.710119247436,
+        "max": 1841.7911529541016
+      },
+      "apply_after_response_ms": {
+        "n": 40,
+        "mean": 72.45215773582458,
+        "p50": 75.04713535308838,
+        "p95": 87.50667572021483,
+        "p99": 97.73488998413086,
+        "max": 100.2960205078125
+      },
+      "phases": {
+        "waiting": 40,
+        "running": 270,
+        "final": 1
+      },
+      "dropped_steps": {
+        "0": 3,
+        "1": 1,
+        "2": 36,
+        "null": 1
+      },
+      "chunk_lengths": {
+        "10": 41
+      },
+      "rpc_errors": [],
+      "rpc_outliers": [
+        {
+          "t": 0,
+          "requested": 1793323557.4043803,
+          "returned": 1793323558.4626453,
+          "applied_t": 11,
+          "dropped_steps": 0,
+          "status": "applied",
+          "error": null,
+          "latency_ms": 1058.264970779419
+        }
+      ]
+    },
+    {
+      "id": "aa87252cb9754094bd84ba2343b07e0d",
+      "status": "finished",
+      "prompt": "Grasp knob and rotate clockwise",
+      "runtime": {
+        "disable_policy_rotation": false,
+        "lighting_correction": null,
+        "lighting_correction_path": null,
+        "relative_action_frame_yaw_deg": 0,
+        "relative_execution": null,
+        "relative_gripper_action_mode": "absolute",
+        "relative_gripper_progress": "timestep",
+        "relative_progress": "timestep",
+        "request_steps": 7,
+        "send_chunk_length": 1
+      },
+      "n_frames": 384,
+      "rpc_ms": {
+        "n": 46,
+        "mean": 115.13491298841393,
+        "p50": 113.59405517578125,
+        "p95": 122.09188938140869,
+        "p99": 143.02848577499378,
+        "max": 159.96813774108887
+      },
+      "steady_rpc_ms": {
+        "n": 45,
+        "mean": 115.1129616631402,
+        "p50": 113.45267295837402,
+        "p95": 122.10979461669922,
+        "p99": 143.40492248535165,
+        "max": 159.96813774108887
+      },
+      "first_rpc_ms": 116.12272262573242,
+      "env_step_running_ms": {
+        "n": 306,
+        "mean": 123.24308725743512,
+        "p50": 100.04234313964844,
+        "p95": 357.1186065673828,
+        "p99": 428.69966030120827,
+        "max": 618.6032295227051
+      },
+      "control_interval_running_ms": {
+        "n": 302,
+        "mean": 124.51915788334726,
+        "p50": 100.6859540939331,
+        "p95": 359.5565557479858,
+        "p99": 430.77929258346575,
+        "max": 623.9640712738037
+      },
+      "query_interval_ms": {
+        "n": 45,
+        "mean": 1017.7048259311252,
+        "p50": 702.9969692230225,
+        "p95": 2500.732040405273,
+        "p99": 4720.266170501714,
+        "max": 5704.93483543396
+      },
+      "apply_after_response_ms": {
+        "n": 46,
+        "mean": 85.77959952147111,
+        "p50": 72.93152809143066,
+        "p95": 230.6593656539917,
+        "p99": 301.08479261398287,
+        "max": 342.4501419067383
+      },
+      "phases": {
+        "waiting": 77,
+        "running": 306,
+        "final": 1
+      },
+      "dropped_steps": {
+        "0": 4,
+        "1": 5,
+        "2": 37
+      },
+      "chunk_lengths": {
+        "10": 46
+      },
+      "rpc_errors": [],
+      "rpc_outliers": []
+    },
+    {
+      "id": "7f73d940df954ea5ad27df8d5f1af27d",
+      "status": "finished",
+      "prompt": "Grasp knob and rotate clockwise",
+      "runtime": {
+        "disable_policy_rotation": false,
+        "lighting_correction": null,
+        "lighting_correction_path": null,
+        "relative_action_frame_yaw_deg": 0,
+        "relative_execution": null,
+        "relative_gripper_action_mode": "absolute",
+        "relative_gripper_progress": "timestep",
+        "relative_progress": "timestep",
+        "request_steps": 7,
+        "send_chunk_length": 1
+      },
+      "n_frames": 404,
+      "rpc_ms": {
+        "n": 58,
+        "mean": 115.36631501954177,
+        "p50": 114.42255973815918,
+        "p95": 120.18351554870605,
+        "p99": 136.0835361480713,
+        "max": 147.51315116882324
+      },
+      "steady_rpc_ms": {
+        "n": 57,
+        "mean": 115.36573945430287,
+        "p50": 114.42041397094727,
+        "p95": 120.23725509643555,
+        "p99": 136.2840557098388,
+        "max": 147.51315116882324
+      },
+      "first_rpc_ms": 115.39912223815918,
+      "env_step_running_ms": {
+        "n": 369,
+        "mean": 209.98958068165354,
+        "p50": 110.01062393188477,
+        "p95": 429.34646606445307,
+        "p99": 551.472196578979,
+        "max": 7134.969234466553
+      },
+      "control_interval_running_ms": {
+        "n": 361,
+        "mean": 191.5318767780082,
+        "p50": 111.82117462158203,
+        "p95": 429.11434173583984,
+        "p99": 509.7785472869865,
+        "max": 1255.491018295288
+      },
+      "query_interval_ms": {
+        "n": 57,
+        "mean": 1366.3905545284874,
+        "p50": 832.3767185211182,
+        "p95": 2997.2367763519287,
+        "p99": 3488.146438598631,
+        "max": 3893.8965797424316
+      },
+      "apply_after_response_ms": {
+        "n": 57,
+        "mean": 157.56295856676604,
+        "p50": 86.77196502685547,
+        "p95": 334.8778247833251,
+        "p99": 692.5741672515854,
+        "max": 1058.2621097564697
+      },
+      "phases": {
+        "waiting": 34,
+        "running": 369,
+        "final": 1
+      },
+      "dropped_steps": {
+        "0": 8,
+        "1": 18,
+        "2": 31,
+        "null": 1
+      },
+      "chunk_lengths": {
+        "10": 58
+      },
+      "rpc_errors": [],
+      "rpc_outliers": []
+    },
+    {
+      "id": "bfca817a52774b158206496eb270a68d",
+      "status": "finished",
+      "prompt": "Grasp knob and rotate clockwise",
+      "runtime": {
+        "disable_policy_rotation": false,
+        "lighting_correction": null,
+        "lighting_correction_path": null,
+        "relative_action_frame_yaw_deg": 0,
+        "relative_execution": null,
+        "relative_gripper_action_mode": "absolute",
+        "relative_gripper_progress": "timestep",
+        "relative_progress": "timestep",
+        "request_steps": 7,
+        "send_chunk_length": 1
+      },
+      "n_frames": 456,
+      "rpc_ms": {
+        "n": 65,
+        "mean": 130.16556593088004,
+        "p50": 114.63046073913574,
+        "p95": 120.57137489318848,
+        "p99": 475.19020080566355,
+        "max": 1051.6490936279297
+      },
+      "steady_rpc_ms": {
+        "n": 64,
+        "mean": 115.76738581061363,
+        "p50": 114.5772933959961,
+        "p95": 120.36521434783936,
+        "p99": 137.43612051010126,
+        "max": 150.93207359313965
+      },
+      "first_rpc_ms": 1051.6490936279297,
+      "env_step_running_ms": {
+        "n": 451,
+        "mean": 213.06728629473835,
+        "p50": 109.5421314239502,
+        "p95": 425.8824586868286,
+        "p99": 915.4325723648071,
+        "max": 7079.449653625488
+      },
+      "control_interval_running_ms": {
+        "n": 450,
+        "mean": 199.28499857584634,
+        "p50": 111.15133762359619,
+        "p95": 425.74988603591913,
+        "p99": 752.0940852165219,
+        "max": 1531.8858623504639
+      },
+      "query_interval_ms": {
+        "n": 64,
+        "mean": 1409.8302833735943,
+        "p50": 760.43701171875,
+        "p95": 3030.8130860328665,
+        "p99": 3989.5233011245714,
+        "max": 4325.09970664978
+      },
+      "apply_after_response_ms": {
+        "n": 65,
+        "mean": 130.98508761479303,
+        "p50": 81.25901222229004,
+        "p95": 304.860258102417,
+        "p99": 337.0648384094238,
+        "max": 356.4152717590332
+      },
+      "phases": {
+        "waiting": 4,
+        "running": 451,
+        "final": 1
+      },
+      "dropped_steps": {
+        "0": 1,
+        "1": 24,
+        "2": 40
+      },
+      "chunk_lengths": {
+        "10": 65
+      },
+      "rpc_errors": [],
+      "rpc_outliers": [
+        {
+          "t": 0,
+          "requested": 1793323294.8319476,
+          "returned": 1793323295.8835967,
+          "applied_t": 4,
+          "dropped_steps": 0,
+          "status": "applied",
+          "error": null,
+          "latency_ms": 1051.6490936279297
+        }
+      ]
+    },
+    {
+      "id": "35071d951da24733bad34d323c9790b4",
+      "status": "finished",
+      "prompt": "Grasp knob and rotate clockwise",
+      "runtime": {
+        "disable_policy_rotation": false,
+        "lighting_correction": null,
+        "lighting_correction_path": null,
+        "relative_action_frame_yaw_deg": 0,
+        "relative_execution": null,
+        "relative_gripper_action_mode": "absolute",
+        "relative_gripper_progress": "timestep",
+        "relative_progress": "timestep",
+        "request_steps": 7,
+        "send_chunk_length": 1
+      },
+      "n_frames": 286,
+      "rpc_ms": {
+        "n": 34,
+        "mean": 143.1634776732501,
+        "p50": 114.36474323272705,
+        "p95": 125.73251724243161,
+        "p99": 763.485901355745,
+        "max": 1072.336196899414
+      },
+      "steady_rpc_ms": {
+        "n": 33,
+        "mean": 115.00672860579057,
+        "p50": 114.1352653503418,
+        "p95": 119.5380687713623,
+        "p99": 131.16162300109863,
+        "max": 136.42621040344238
+      },
+      "first_rpc_ms": 1072.336196899414,
+      "env_step_running_ms": {
+        "n": 235,
+        "mean": 194.19977715674867,
+        "p50": 110.04424095153809,
+        "p95": 425.16987323760986,
+        "p99": 720.2204608917225,
+        "max": 1145.5860137939453
+      },
+      "control_interval_running_ms": {
+        "n": 234,
+        "mean": 194.55556074778238,
+        "p50": 110.96227169036865,
+        "p95": 421.8811631202697,
+        "p99": 725.0778913497884,
+        "max": 1145.8618640899658
+      },
+      "query_interval_ms": {
+        "n": 33,
+        "mean": 1374.146793827866,
+        "p50": 736.4280223846436,
+        "p95": 2921.084165573119,
+        "p99": 3628.0654335021973,
+        "max": 3741.516590118408
+      },
+      "apply_after_response_ms": {
+        "n": 34,
+        "mean": 128.70529819937315,
+        "p50": 83.86111259460449,
+        "p95": 291.79018735885614,
+        "p99": 330.82131862640387,
+        "max": 342.12374687194824
+      },
+      "phases": {
+        "waiting": 50,
+        "running": 235,
+        "final": 1
+      },
+      "dropped_steps": {
+        "0": 1,
+        "1": 12,
+        "2": 21
+      },
+      "chunk_lengths": {
+        "10": 34
+      },
+      "rpc_errors": [],
+      "rpc_outliers": [
+        {
+          "t": 0,
+          "requested": 1793323218.513609,
+          "returned": 1793323219.5859451,
+          "applied_t": 3,
+          "dropped_steps": 0,
+          "status": "applied",
+          "error": null,
+          "latency_ms": 1072.336196899414
+        }
+      ]
+    },
+    {
+      "id": "47ff0bdff2c64f5a883c27f94ea79a0a",
+      "status": "finished",
+      "prompt": "Grasp knob and rotate clockwise",
+      "runtime": {
+        "disable_policy_rotation": false,
+        "lighting_correction": null,
+        "lighting_correction_path": null,
+        "relative_action_frame_yaw_deg": 0,
+        "relative_execution": null,
+        "relative_gripper_action_mode": "absolute",
+        "relative_gripper_progress": "timestep",
+        "relative_progress": "timestep",
+        "request_steps": 7,
+        "send_chunk_length": 1
+      },
+      "n_frames": 305,
+      "rpc_ms": {
+        "n": 37,
+        "mean": 164.3975812035638,
+        "p50": 115.0057315826416,
+        "p95": 121.3789939880371,
+        "p99": 1282.042636871339,
+        "max": 1933.1738948822021
+      },
+      "steady_rpc_ms": {
+        "n": 36,
+        "mean": 115.26490582360162,
+        "p50": 114.89105224609375,
+        "p95": 120.28449773788452,
+        "p99": 123.12103509902954,
+        "max": 124.47595596313477
+      },
+      "first_rpc_ms": 1933.1738948822021,
+      "env_step_running_ms": {
+        "n": 234,
+        "mean": 208.2670162885617,
+        "p50": 107.46169090270996,
+        "p95": 457.83774852752686,
+        "p99": 1100.216808319091,
+        "max": 1742.8760528564453
+      },
+      "control_interval_running_ms": {
+        "n": 233,
+        "mean": 208.70993986661853,
+        "p50": 109.43984985351562,
+        "p95": 458.4022998809814,
+        "p99": 1101.4372730255132,
+        "max": 1743.182897567749
+      },
+      "query_interval_ms": {
+        "n": 36,
+        "mean": 1521.183709303538,
+        "p50": 821.2573528289795,
+        "p95": 3353.1559705734253,
+        "p99": 4331.258213520049,
+        "max": 4518.353700637817
+      },
+      "apply_after_response_ms": {
+        "n": 34,
+        "mean": 148.43519294963164,
+        "p50": 82.23724365234375,
+        "p95": 336.41263246536255,
+        "p99": 363.9879488945008,
+        "max": 377.42090225219727
+      },
+      "phases": {
+        "waiting": 70,
+        "running": 234,
+        "final": 1
+      },
+      "dropped_steps": {
+        "0": 1,
+        "1": 14,
+        "2": 19,
+        "null": 3
+      },
+      "chunk_lengths": {
+        "10": 37
+      },
+      "rpc_errors": [],
+      "rpc_outliers": [
+        {
+          "t": 0,
+          "requested": 1793323140.9510338,
+          "returned": 1793323142.8842077,
+          "applied_t": 18,
+          "dropped_steps": 0,
+          "status": "applied",
+          "error": null,
+          "latency_ms": 1933.1738948822021
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "rpc_ms": {
+      "n": 349,
+      "mean": 128.28503365503,
+      "p50": 114.20750617980957,
+      "p95": 120.97330093383788,
+      "p99": 623.64223480223,
+      "max": 1933.1738948822021
+    },
+    "steady_rpc_ms": {
+      "n": 342,
+      "mean": 114.9471844846045,
+      "p50": 114.14134502410889,
+      "p95": 120.39042711257935,
+      "p99": 140.10268211364732,
+      "max": 159.96813774108887
+    },
+    "first_rpc_ms": {
+      "n": 7,
+      "mean": 779.9342359815325,
+      "p50": 1051.6490936279297,
+      "p95": 1674.9225854873653,
+      "p99": 1881.5236330032344,
+      "max": 1933.1738948822021
+    },
+    "env_step_running_ms": {
+      "n": 2323,
+      "mean": 162.47341399864035,
+      "p50": 102.68473625183105,
+      "p95": 413.31114768981934,
+      "p99": 501.2498426437389,
+      "max": 7134.969234466553
+    },
+    "waiting_frames": 354,
+    "total_frames": 2684
+  },
+  "measurement_notes": {
+    "rpc_ms": "Kingston journal returned-requested; includes RPC transport, server inference, and client action postprocessing. Excludes observation preprocessing before journal.prediction.",
+    "steady_rpc_ms": "Excludes the first successful request of each episode.",
+    "env_step_running_ms": "Kingston journal command_completed-timestamp for running frames; includes frame recording and environment step, not an isolated robot-driver timer.",
+    "active_system_modified": false,
+    "inference_queries_sent": false,
+    "robot_control_requests_sent": false
+  }
+}

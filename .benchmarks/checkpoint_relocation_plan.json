@@ -1,0 +1,140 @@
+{
+  "created_at": "2026-10-29T11:10:39.577521+00:00",
+  "source_root": "/home/jack/Skilled_FLOWER",
+  "destination_root": "/data/jack/Skilled_FLOWER/checkpoints",
+  "total_bytes": 93896634332,
+  "checkpoints": [
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/resumes/flower_sfm_xy_b64_e40_resume_20261029_123336/seed_42/saved_models/epoch029.ckpt",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/seed_42/saved_models/epoch029.ckpt",
+      "source_signature": {
+        "device": 66308,
+        "inode": 203948038,
+        "size": 13413836356,
+        "mtime_ns": 1793256362696590936
+      }
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/resumes/flower_sfm_xy_b64_e40_resume_20261029_123336/seed_42/saved_models/epoch034.ckpt",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/seed_42/saved_models/epoch034.ckpt",
+      "source_signature": {
+        "device": 66308,
+        "inode": 203961132,
+        "size": 13413836356,
+        "mtime_ns": 1793262122540307982
+      }
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch014.ckpt",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch014.ckpt",
+      "source_signature": {
+        "device": 66308,
+        "inode": 198349050,
+        "size": 13413824580,
+        "mtime_ns": 1793146864057244347
+      }
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt",
+      "source_signature": {
+        "device": 66308,
+        "inode": 198349049,
+        "size": 13413824580,
+        "mtime_ns": 1793152438041192781
+      }
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy/resumes/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/saved_models/epoch019.ckpt",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/saved_models/epoch019.ckpt",
+      "source_signature": {
+        "device": 66308,
+        "inode": 198976510,
+        "size": 13413770820,
+        "mtime_ns": 1793210337233573370
+      }
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy/resumes/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/saved_models/epoch029.ckpt",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/saved_models/epoch029.ckpt",
+      "source_signature": {
+        "device": 66308,
+        "inode": 198976515,
+        "size": 13413770820,
+        "mtime_ns": 1793221868585185871
+      }
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy/resumes/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/saved_models/epoch039.ckpt",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/saved_models/epoch039.ckpt",
+      "source_signature": {
+        "device": 66308,
+        "inode": 198976513,
+        "size": 13413770820,
+        "mtime_ns": 1793233217119586266
+      }
+    }
+  ],
+  "metadata": [
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/resumes/flower_sfm_xy_b64_e40_resume_20261029_123336/.hydra/config.yaml",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/.hydra/config.yaml"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/resumes/flower_sfm_xy_b64_e40_resume_20261029_123336/.hydra/hydra.yaml",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/.hydra/hydra.yaml"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/resumes/flower_sfm_xy_b64_e40_resume_20261029_123336/.hydra/overrides.yaml",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/.hydra/overrides.yaml"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/resumes/flower_sfm_xy_b64_e40_resume_20261029_123336/run_metadata.json",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/run_metadata.json"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/resumes/flower_sfm_xy_b64_e40_resume_20261029_123336/seed_42/training_status.json",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_xy_b64_e40_resume_20261029_123336/seed_42/training_status.json"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/.hydra/config.yaml",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/.hydra/config.yaml"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/.hydra/hydra.yaml",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/.hydra/hydra.yaml"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/.hydra/overrides.yaml",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/.hydra/overrides.yaml"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/run_metadata.json",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/run_metadata.json"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/seed_42/training_status.json",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/seed_42/training_status.json"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy/resumes/flower_sfm_no_xy_b64_e40_resume_20261028_215541/.hydra/config.yaml",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/.hydra/config.yaml"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy/resumes/flower_sfm_no_xy_b64_e40_resume_20261028_215541/.hydra/hydra.yaml",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/.hydra/hydra.yaml"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy/resumes/flower_sfm_no_xy_b64_e40_resume_20261028_215541/.hydra/overrides.yaml",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/.hydra/overrides.yaml"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy/resumes/flower_sfm_no_xy_b64_e40_resume_20261028_215541/run_metadata.json",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/run_metadata.json"
+    },
+    {
+      "source": "/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy/resumes/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/training_status.json",
+      "destination": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm_no_xy/flower_sfm_no_xy_b64_e40_resume_20261028_215541/seed_42/training_status.json"
+    }
+  ]
+}

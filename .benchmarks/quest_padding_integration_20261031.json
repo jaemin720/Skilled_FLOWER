@@ -1,0 +1,84 @@
+{
+  "results": [
+    {
+      "source": "both",
+      "device": "cpu",
+      "config": "config_sfm_ablation_123",
+      "checkpoint": {
+        "path": "/home/jack/Quest_SFM/flower_id2430_code/artifacts/research/flower_stage2_20261030/stageII/final.pt",
+        "sha256": "0701c0938af1167deb906e4705d34e8d6693d940c0c2fe4d18f10c7d3a3411ce",
+        "complete": true,
+        "stage": 1,
+        "completed_epochs": 101,
+        "steps": 97364,
+        "training_seed": 0,
+        "config_hash": "7637af0cb50d4b6bb11db9d6b1e80801597ecf1d7a3e48668b407704cfe5e4e9",
+        "quest_source": "/home/jack/Quest_SFM/flower_id2430_code/artifacts/research/seeds_64_302_source_20260930/quest",
+        "model_class": "research_addenda.id700_power.policy.PowerPriorPolicy",
+        "clip_snapshot": "/home/jack/Quest_SFM/clip-vit-base-patch32",
+        "task_names": [
+          "audio_jack",
+          "barlatch",
+          "bnc",
+          "hdmi",
+          "knob",
+          "lan",
+          "outlet",
+          "rotary_switch",
+          "usb"
+        ]
+      },
+      "samples": [
+        40,
+        0
+      ],
+      "skill_shape": {
+        "history": [
+          2,
+          8,
+          4
+        ],
+        "current": [
+          2,
+          8,
+          4
+        ]
+      },
+      "action_shape": [
+        2,
+        10,
+        7
+      ],
+      "native_skill_exact_match": true,
+      "frozen_weights_unchanged": true,
+      "skill_calls_per_flow_sample": 1,
+      "backward_checked": true,
+      "loss": 1.6847832202911377,
+      "history_padding": {
+        "normalized_physical_zero": [
+          -1.2364959900423855e-07,
+          -0.9301646947860718,
+          -3.248862157079202e-08,
+          -7.656934940314386e-06,
+          -2.1586030925391242e-05,
+          8.672435214407415e-09,
+          1.0
+        ],
+        "inverse_physical_action": [
+          -5.4774123792896035e-18,
+          -1.5813139235543172e-09,
+          -3.778844244104453e-18,
+          -4.233137962017194e-20,
+          -3.308675396236836e-20,
+          -1.6298634957834732e-19,
+          1.0
+        ],
+        "inverse_pose_max_abs_error": 1.5813139235543172e-09,
+        "padded_slots_checked": 32,
+        "native_normalization_exact_match": true,
+        "mask_semantics": "Replace missing-history slots before encoding; no attention masking"
+      },
+      "quest_weights_sha256": "fca5f7101a4d799690a2dba217f488653c8bbfa3dd45a33e14830b3ae9bdd72d"
+    }
+  ]
+}

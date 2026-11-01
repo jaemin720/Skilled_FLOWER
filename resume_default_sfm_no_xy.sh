@@ -34,5 +34,6 @@ exec /home/jack/miniforge3/envs/flower/bin/python -u flower/training_calvin.py \
   '+model.lr_scheduler.lr_scheduler.extend_on_resume=true' \
   'hydra.run.dir=/home/jack/Skilled_FLOWER/logs/default_sfm_no_xy/resumes/${now:%Y-%m-%d}/${now:%H-%M-%S}' \
   'logger.save_dir=${hydra:run.dir}' \
-  'callbacks.checkpoint.dirpath=${hydra:run.dir}/seed_42/saved_models' \
+  '++checkpoint_root=/data/jack/Skilled_FLOWER/checkpoints' \
+  'callbacks.checkpoint.dirpath=null' \
   "$@"

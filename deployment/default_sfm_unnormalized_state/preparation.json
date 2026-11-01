@@ -1,0 +1,50 @@
+{
+  "prepared_at": "2026-10-30T01:14:21.636959+00:00",
+  "checkpoint": "/home/jack/Skilled_FLOWER/logs/default_sfm_unnormalized_state/runs/flower_sfm_no_xy_unnorm_e40_b64_20261029_200954/seed_42/saved_models/epoch039.ckpt",
+  "checkpoint_size_bytes": 13413759364,
+  "training_config": "/home/jack/Skilled_FLOWER/logs/default_sfm_unnormalized_state/runs/flower_sfm_no_xy_unnorm_e40_b64_20261029_200954/.hydra/config.yaml",
+  "epoch": 40,
+  "global_step": 41640,
+  "weights": "ema",
+  "proprio_source": "physical",
+  "proprio_dim": 11,
+  "action_horizon": 10,
+  "ft_history_shape": [
+    50,
+    6
+  ],
+  "gpu": 0,
+  "host": "10.206.178.31",
+  "port": 45589,
+  "request_steps": 5,
+  "bundle_id": "07c86390e0d1caacc8f9d0d15b14de5359c101eb1b46017fc29494da99eefd9a",
+  "server_bundle": "/home/jack/Skilled_FLOWER/datasets/default_sfm_crop_v2/rpc_bundle",
+  "kingston_bundle": "/home/csilab/share_projects/clean_share/team_codes/flower_default_sfm_rpc_20261028/rpc_bundle",
+  "kingston_launcher": "/home/csilab/share_projects/clean_share/team_codes/flower_default_sfm_unnormalized_state_rpc_20261030/run_client.sh",
+  "checks": {
+    "training_completed": true,
+    "epoch_40_step_41640": true,
+    "physical_state": true,
+    "state_11": true,
+    "xy_removed": true,
+    "horizon_10": true,
+    "gru_50x6": true,
+    "ema_step_matches": true,
+    "ema_tensors_match": true,
+    "no_cuda_initialized": true,
+    "shell_syntax": true,
+    "server_help": true,
+    "physical_state_rpc_cpu_test": true,
+    "kingston_launcher_deployed": true,
+    "kingston_bundle_matches": true,
+    "original_kingston_client_unchanged": true
+  },
+  "inference_server_started": false,
+  "robot_client_started": false,
+  "gpu_inference_tested": false,
+  "kingston_original_client_sha256": "386a8409b5339a1092e49e37d24e6a055f97c420e1d8c5ce7532cb83edaf200a",
+  "launcher_hashes": {
+    "run_server.sh": "7d2903c09c1e04d525b6677c1eb762d8f8b18049cad36e9f3d9935883536260a",
+    "run_client.sh": "538fcbce59d45587655db71359c3a48dbf9d5812503966a3156a5d459616d290"
+  }
+}

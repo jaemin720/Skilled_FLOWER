@@ -1,0 +1,12 @@
+defaults:
+  - config_sfm_ablation_base
+  - _self_
+experiment_components: [3]
+model:
+  skill_source: history
+datamodule:
+  datasets:
+    lang_dataset:
+      load_skill_history: true
+logger:
+  name: gru_history_skill

@@ -1,0 +1,22 @@
+defaults:
+  - config_default_sfm
+  - _self_
+
+quest_project_root: ${oc.env:QUEST_SFM_ROOT,/home/jack/Quest_SFM/flower_id2430_code}
+log_dir: /home/jack/Skilled_FLOWER/logs/default_sfm_skill_history
+
+model:
+  skill_source: history
+  quest_project_root: ${quest_project_root}
+  # Stage II contains exactly the frozen Stage-I AE; no separate file is needed.
+  quest_checkpoint_path: ${quest_project_root}/artifacts/research/flower_stage2_20261030/stageII/final.pt
+  skill_cond_pool: mean
+
+datamodule:
+  datasets:
+    lang_dataset:
+      load_skill_history: true
+
+logger:
+  name: flower_default_sfm_skill_history
+  group: default_sfm_skill_history

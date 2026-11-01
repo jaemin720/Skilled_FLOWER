@@ -1,0 +1,201 @@
+{
+  "request": {
+    "created_at": "2026-10-30T21:09:52.255422+00:00",
+    "physical_gpus": [
+      2,
+      3
+    ],
+    "per_gpu_batch_size": 64,
+    "global_batch_size": 128,
+    "steps": 10,
+    "production_plan": "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/plan.json",
+    "production_gpus": [
+      0,
+      1
+    ],
+    "source_manifest": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/source_manifest.json",
+    "commands": [
+      {
+        "name": "01_13_faflow_history",
+        "config": "config_sfm_ablation_13",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/01_13_faflow_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_13",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/01_13_faflow_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/01_13_faflow_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/01_13_faflow_history/checkpoints"
+        ]
+      },
+      {
+        "name": "02_123_faflow_current_history",
+        "config": "config_sfm_ablation_123",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/02_123_faflow_current_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_123",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/02_123_faflow_current_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/02_123_faflow_current_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/02_123_faflow_current_history/checkpoints"
+        ]
+      },
+      {
+        "name": "03_12_faflow_current",
+        "config": "config_sfm_ablation_12",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/03_12_faflow_current",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_12",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/03_12_faflow_current",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/03_12_faflow_current",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/03_12_faflow_current/checkpoints"
+        ]
+      },
+      {
+        "name": "04_3_gru_history",
+        "config": "config_sfm_ablation_3",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/04_3_gru_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_3",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/04_3_gru_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/04_3_gru_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/04_3_gru_history/checkpoints"
+        ]
+      },
+      {
+        "name": "05_23_gru_current_history",
+        "config": "config_sfm_ablation_23",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/05_23_gru_current_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_23",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/05_23_gru_current_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/05_23_gru_current_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/05_23_gru_current_history/checkpoints"
+        ]
+      },
+      {
+        "name": "06_2_gru_current",
+        "config": "config_sfm_ablation_2",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/06_2_gru_current",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_2",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=10",
+          "callbacks.status.every_n_steps=1",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/06_2_gru_current",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/06_2_gru_current",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/06_2_gru_current/checkpoints"
+        ]
+      }
+    ]
+  },
+  "state": "failed",
+  "started_at": "2026-10-30T21:09:52.255837+00:00",
+  "results": [
+    {
+      "name": "01_13_faflow_history",
+      "config": "config_sfm_ablation_13",
+      "state": "failed",
+      "started_at": "2026-10-30T21:09:52.654580+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 81723,
+        "3": 81723
+      },
+      "pid": 3310833,
+      "progress": {
+        "state": "failed",
+        "updated_at": "2026-10-30T21:10:21.698564+00:00",
+        "epoch": 1,
+        "global_step": 1,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": null,
+        "learning_rates": [
+          2.0000000000000003e-06,
+          2.0000000000000003e-06
+        ],
+        "amp_scale": 65536.0,
+        "gru_weight_version_change": 2,
+        "elapsed_seconds": 6.524333783425391,
+        "gpu_allocated_gib": 18.87034797668457,
+        "gpu_peak_allocated_gib": 77.58872127532959,
+        "error": "RuntimeError: result type Float can't be cast to the desired output type Int"
+      },
+      "exit_code": 1,
+      "elapsed_seconds": 43.65989606641233,
+      "ended_at": "2026-10-30T21:10:36.314926+00:00"
+    }
+  ],
+  "error": "RuntimeError: 01_13_faflow_history failed; see /home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031/01_13_faflow_history/console.log",
+  "ended_at": "2026-10-30T21:10:36.315155+00:00"
+}

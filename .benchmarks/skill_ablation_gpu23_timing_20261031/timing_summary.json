@@ -1,0 +1,129 @@
+{
+  "created_at_kst": "2026-10-31T06:45:08.968679+09:00",
+  "report": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/report.json",
+  "per_gpu_batch": 64,
+  "global_batch": 128,
+  "physical_test_gpus": [
+    2,
+    3
+  ],
+  "production_gpus": [
+    0,
+    1
+  ],
+  "warmup_steps": 20,
+  "measured_steps": 40,
+  "rows": [
+    {
+      "components": "1,3",
+      "seconds_per_step": 1.069006563187577,
+      "epoch_minutes": 18.54726387130446,
+      "training_30_epoch_hours": 9.273631935652231,
+      "scheduled_hours_including_preflight": 9.318994556941625,
+      "estimated_training_start_kst": "2026-10-31T08:06:50.858785+09:00",
+      "estimated_training_end_kst": "2026-10-31T17:25:07.657451+09:00",
+      "gpu2_peak_mib": 89863,
+      "gpu3_peak_mib": 89863
+    },
+    {
+      "components": "1,2,3",
+      "seconds_per_step": 1.1412401160923764,
+      "epoch_minutes": 19.80051601420273,
+      "training_30_epoch_hours": 9.900258007101366,
+      "scheduled_hours_including_preflight": 9.946536891742968,
+      "estimated_training_start_kst": "2026-10-31T17:26:00.960697+09:00",
+      "estimated_training_end_kst": "2026-11-01T03:21:55.190261+09:00",
+      "gpu2_peak_mib": 91133,
+      "gpu3_peak_mib": 91133
+    },
+    {
+      "components": "1,2",
+      "seconds_per_step": 1.1399155699182302,
+      "epoch_minutes": 19.777535138081294,
+      "training_30_epoch_hours": 9.888767569040647,
+      "scheduled_hours_including_preflight": 9.93503125777656,
+      "estimated_training_start_kst": "2026-11-01T03:22:48.464830+09:00",
+      "estimated_training_end_kst": "2026-11-01T13:18:01.302789+09:00",
+      "gpu2_peak_mib": 91133,
+      "gpu3_peak_mib": 91133
+    },
+    {
+      "components": "3",
+      "seconds_per_step": 1.0759322428377345,
+      "epoch_minutes": 18.667424413234695,
+      "training_30_epoch_hours": 9.333712206617347,
+      "scheduled_hours_including_preflight": 9.37770038575397,
+      "estimated_training_start_kst": "2026-11-01T13:18:50.417457+09:00",
+      "estimated_training_end_kst": "2026-11-01T22:40:41.024177+09:00",
+      "gpu2_peak_mib": 89761,
+      "gpu3_peak_mib": 89761
+    },
+    {
+      "components": "2,3",
+      "seconds_per_step": 1.1206383765675128,
+      "epoch_minutes": 19.443075833446347,
+      "training_30_epoch_hours": 9.721537916723173,
+      "scheduled_hours_including_preflight": 9.768729972020058,
+      "estimated_training_start_kst": "2026-11-01T22:41:35.950529+09:00",
+      "estimated_training_end_kst": "2026-11-02T08:26:48.452077+09:00",
+      "gpu2_peak_mib": 91031,
+      "gpu3_peak_mib": 91031
+    },
+    {
+      "components": "2",
+      "seconds_per_step": 1.1251482940744608,
+      "epoch_minutes": 19.521322902191898,
+      "training_30_epoch_hours": 9.760661451095949,
+      "scheduled_hours_including_preflight": 9.80765690846719,
+      "estimated_training_start_kst": "2026-11-02T08:27:43.029062+09:00",
+      "estimated_training_end_kst": "2026-11-02T18:15:16.016947+09:00",
+      "gpu2_peak_mib": 91029,
+      "gpu3_peak_mib": 91029
+    }
+  ],
+  "baseline_status": {
+    "state": "running",
+    "updated_at": "2026-10-30T21:45:02.702324+00:00",
+    "epoch": 26,
+    "global_step": 26720,
+    "steps_per_epoch": 1041,
+    "max_epochs": 30,
+    "loss": 0.07961970567703247,
+    "learning_rates": [
+      1.0695491831777613e-05,
+      1.0695491831777613e-05
+    ],
+    "amp_scale": 131072.0,
+    "gru_weight_version_change": 53420,
+    "elapsed_seconds": 28706.830102682114,
+    "gpu_allocated_gib": 18.82107973098755,
+    "gpu_peak_allocated_gib": 86.5758409500122,
+    "batch_index": 694
+  },
+  "baseline_recent_seconds_per_step": 1.0722427341155707,
+  "baseline_remaining_hours": 1.3473078797222222,
+  "baseline_estimated_end_kst": "2026-10-31T08:05:59.277046+09:00",
+  "observed_baseline_checkpoint_extra_seconds": [
+    20.759990917518735,
+    22.516530077904463,
+    20.607560445554554,
+    22.194665395654738,
+    19.20813592430204
+  ],
+  "assumed_seconds_per_future_checkpoint": 20.759990917518735,
+  "six_models_training_hours": 57.87856908623071,
+  "six_models_scheduled_hours": 58.154649972499996,
+  "all_remaining_hours": 59.501957852222226,
+  "estimated_queue_end_kst": "2026-11-02T18:15:16.016947+09:00",
+  "planning_margin_fraction": 0.1,
+  "planning_end_range_kst": [
+    "2026-11-02T12:18:15.312120+09:00",
+    "2026-11-03T00:12:16.721774+09:00"
+  ],
+  "assumptions": [
+    "Current GPU 0/1 run completes successfully and all six jobs run serially without interruption.",
+    "GPU 2/3 throughput is representative of the same GPU model on 0/1.",
+    "Checkpoint overhead is approximated by the active baseline; Skill checkpoint writes are not directly timed.",
+    "The 10% planning margin is a practical allowance, not a statistical confidence interval."
+  ]
+}

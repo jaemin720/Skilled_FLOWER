@@ -9,6 +9,7 @@ from torchvision.transforms import ColorJitter, Compose, Normalize
 
 from flower.datasets.disk_dataset import ExtendedDiskDataset
 from flower.datasets.sfm_proprioception import load_physical_proprio, validate_proprio_source
+from flower.utils.action_history import normalized_zero_motion_action
 from flower.utils.transforms import ScaleImageTensor
 
 
@@ -22,7 +23,10 @@ class SfmDiskDataset(ExtendedDiskDataset):
     """
 
     def __init__(self, *args, shared_color_jitter=True, allow_smoke_test=False,
-                 proprio_source="normalized", **kwargs):
+                 proprio_source="normalized", load_skill_history=False,
+                 load_quest_observations=False, **kwargs):
+        self.load_skill_history = bool(load_skill_history)
+        self.load_quest_observations = bool(load_quest_observations)
         dataset_dir = Path(kwargs["datasets_dir"])
         root = dataset_dir.parent
         self.contract = json.loads((root / "data_contract.json").read_text())
@@ -31,6 +35,9 @@ class SfmDiskDataset(ExtendedDiskDataset):
             raise ValueError("A complete production SFM dataset is required")
         if self.contract["schema"] != "flower_calvin_npz_sfm_v1":
             raise ValueError("Unsupported SFM data contract")
+        if self.load_skill_history:
+            normalization = json.loads((root / self.contract["normalization_file"]).read_text())
+            self.skill_history_padding_action = normalized_zero_motion_action(normalization)
         self.proprio_source = validate_proprio_source(proprio_source)
         self.physical_proprio = load_physical_proprio(root) if self.proprio_source == "physical" else None
         if self.contract.get("prohibit_additional_crop", False):
@@ -91,8 +98,17 @@ class SfmDiskDataset(ExtendedDiskDataset):
 
     def _load_episode(self, idx, window_size):
         episode = super()._load_episode(idx, window_size)
+        start = int(self.episode_lookup[idx])
+        if self.load_skill_history:
+            episode.update(self._build_skill_prev_history(start + self.obs_seq_len - 1))
+        if self.load_quest_observations:
+            # Quest's prior was trained on the stored crops and normalized full
+            # state. Preserve these BEFORE color augmentation or physical/XY
+            # proprio ablations used by FLOWER.
+            for key in ("rgb_static", "rgb_gripper"):
+                episode[f"quest_{key}"] = episode[key].transpose(0, 3, 1, 2).copy()
+            episode["quest_robot_obs"] = episode["robot_obs"].copy()
         if self.physical_proprio is not None:
-            start = int(self.episode_lookup[idx])
             episode["robot_obs"] = np.array(self.physical_proprio[start:start + self.obs_seq_len], copy=True)
         if self.color_jitter is None:
             return episode
@@ -114,3 +130,35 @@ class SfmDiskDataset(ExtendedDiskDataset):
             image[:, :, left + w:] = 0
             episode[key] = image
         return episode
+
+    def _build_skill_prev_history(self, current_t):
+        """[t-32,t) within this demo; t is the first target action, never history."""
+        episode_id = np.searchsorted(self.ep_start_end_ids[:, 0], current_t, side="right") - 1
+        if episode_id < 0 or current_t > self.ep_start_end_ids[episode_id, 1]:
+            raise ValueError(f"Frame {current_t} is outside the inclusive demo boundaries")
+        start = max(int(self.ep_start_end_ids[episode_id, 0]), current_t - 32)
+        # Physical zero motion is not zero in the asymmetric normalized action
+        # space. Keep the existing +1 (open) startup gripper convention.
+        history = np.broadcast_to(self.skill_history_padding_action, (32, 7)).copy()
+        valid = np.zeros(32, dtype=np.float32)
+        count = current_t - start
+        if count:
+            if self.use_extracted_rel_actions:
+                indices = [self.extracted_ep_npz_name_to_npy_idx[t] for t in range(start, current_t)]
+                actions = self.extracted_ep_rel_actions[indices]
+            else:
+                actions = []
+                for t in range(start, current_t):
+                    frame = self.load_file(self._get_episode_name(t))
+                    try:
+                        actions.append(np.asarray(frame["rel_actions"], dtype=np.float32).copy())
+                    finally:
+                        if hasattr(frame, "close"):
+                            frame.close()
+                actions = np.stack(actions)
+            if actions.shape != (count, 7) or not np.isfinite(actions).all():
+                raise ValueError("Quest history requires finite normalized 7-D rel_actions")
+            # SFM already stores held gripper targets; do not apply old relabeling.
+            history[-count:] = actions
+            valid[-count:] = 1
+        return dict(skill_prev_actions=history, skill_prev_valid_mask=valid)

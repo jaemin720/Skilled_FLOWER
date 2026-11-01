@@ -7,10 +7,10 @@
   "client_deployment": "/home/csilab/share_projects/clean_share/team_codes/flower_default_sfm_rpc_20261028",
   "local_bundle": "/home/jack/Skilled_FLOWER/datasets/default_sfm_crop_v2/rpc_bundle",
   "bundle_id": "07c86390e0d1caacc8f9d0d15b14de5359c101eb1b46017fc29494da99eefd9a",
-  "default_checkpoint": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt",
+  "default_checkpoint": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt",
   "checkpoint_bytes": 13413824580,
   "checkpoint_mtime_ns": 1793152438041192781,
-  "training_config": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/.hydra/config.yaml",
+  "training_config": "/data/jack/Skilled_FLOWER/checkpoints/default_sfm/flower_sfm_b64_20261028_043405/.hydra/config.yaml",
   "training_config_sha256": "b3b23a5ef7b16c5b84339ed2fef2d137b689ebf04f7bd26f21e11e0165307696",
   "weights": "ema",
   "trained_action_horizon": 10,
@@ -54,11 +54,14 @@
     "latency_measured": false
   },
   "prepared_file_sha256": {
-    "server_flower_rpc.py": "9b2847a87775205c5564003f6bc355964d63ce95a4f15bc308755f27e957d431",
+    "server_flower_rpc.py": "5f48d3c34b025e4b193a3457b27b62e53da77893e5e7465e9cf0f58cbb392ad1",
     "deployment/default_sfm/run_server.sh": "fc1592a628787a8b52b39d4c68503787c0a51311d584e64c08ea4c555478927b",
     "deployment/default_sfm/run_client.sh": "7e31b70bf781715e3ada2e6e595a504f56d58fc22f352660c07dd696bbc58d2b",
     "deployment/default_sfm/verify_client_bundle.py": "2e56d96adb056bded509352ca6413b00bd8b091d1d97d3b8d90fc0aa036e2a6c",
     "scripts/build_default_sfm_rpc_bundle.py": "82a8390f818bb047ce2d5b15e65c730f1ef104f5493c58fc29b7a6dd6aa17180",
     "scripts/build_default_sfm_rpc_fixture.py": "fd1154a06c37aa3403287a5d349b4b257509d80039af020e312b72e992b81669"
-  }
+  },
+  "previous_checkpoint_path": "/home/jack/Skilled_FLOWER/logs/default_sfm/runs/flower_sfm_b64_20261028_043405/seed_42/saved_models/epoch019.ckpt",
+  "checkpoint_storage_root": "/data/jack/Skilled_FLOWER/checkpoints",
+  "checkpoint_relocation_manifest": "/data/jack/Skilled_FLOWER/checkpoints/relocation_manifest.json"
 }

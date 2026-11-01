@@ -157,6 +157,9 @@ class BaseDataset(Dataset):
         # Keep optional force history and bounding boxes alongside the model inputs.
         for key in (
             "right_force_history",
+            "skill_prev_actions",
+            "skill_prev_valid_mask",
+            "quest_robot_obs",
             getattr(self, "bbox_key", "bbox"),
         ):
             if key in episode:
@@ -164,6 +167,12 @@ class BaseDataset(Dataset):
                     seq_dict[key] = episode[key].float()
                 else:
                     seq_dict[key] = torch.from_numpy(episode[key]).float()
+
+        # Quest performs its own pixel scaling. Retain uint8 rather than passing
+        # Florence-normalized tensors through the frozen image encoders again.
+        for key in ("quest_rgb_static", "quest_rgb_gripper"):
+            if key in episode:
+                seq_dict[key] = torch.as_tensor(episode[key])
 
         return seq_dict
 

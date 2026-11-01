@@ -1,0 +1,5 @@
+# Additional imports required by the Quest_SFM ID2430 handoff in the FLOWER env.
+# Keep the installed FLOWER torch/transformers/Hydra versions; _partial_ syntax
+# is adapted locally by flower.models.networks.quest_skill.
+h5py==3.10.0
+natsort==8.4.0

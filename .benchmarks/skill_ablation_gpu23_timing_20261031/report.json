@@ -1,0 +1,722 @@
+{
+  "request": {
+    "created_at": "2026-10-30T21:34:00.929831+00:00",
+    "physical_gpus": [
+      2,
+      3
+    ],
+    "per_gpu_batch_size": 64,
+    "global_batch_size": 128,
+    "steps": 60,
+    "production_plan": "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/plan.json",
+    "timing": true,
+    "warmup_steps": 20,
+    "measured_steps": 40,
+    "production_gpus": [
+      0,
+      1
+    ],
+    "source_manifest": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/source_manifest.json",
+    "commands": [
+      {
+        "name": "01_13_faflow_history",
+        "config": "config_sfm_ablation_13",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/01_13_faflow_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_13",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=60",
+          "callbacks.status.every_n_steps=20",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/01_13_faflow_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/01_13_faflow_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/01_13_faflow_history/checkpoints"
+        ]
+      },
+      {
+        "name": "02_123_faflow_current_history",
+        "config": "config_sfm_ablation_123",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/02_123_faflow_current_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_123",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=60",
+          "callbacks.status.every_n_steps=20",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/02_123_faflow_current_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/02_123_faflow_current_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/02_123_faflow_current_history/checkpoints"
+        ]
+      },
+      {
+        "name": "03_12_faflow_current",
+        "config": "config_sfm_ablation_12",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/03_12_faflow_current",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_12",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=60",
+          "callbacks.status.every_n_steps=20",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/03_12_faflow_current",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/03_12_faflow_current",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/03_12_faflow_current/checkpoints"
+        ]
+      },
+      {
+        "name": "04_3_gru_history",
+        "config": "config_sfm_ablation_3",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/04_3_gru_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_3",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=60",
+          "callbacks.status.every_n_steps=20",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/04_3_gru_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/04_3_gru_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/04_3_gru_history/checkpoints"
+        ]
+      },
+      {
+        "name": "05_23_gru_current_history",
+        "config": "config_sfm_ablation_23",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/05_23_gru_current_history",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_23",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=60",
+          "callbacks.status.every_n_steps=20",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/05_23_gru_current_history",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/05_23_gru_current_history",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/05_23_gru_current_history/checkpoints"
+        ]
+      },
+      {
+        "name": "06_2_gru_current",
+        "config": "config_sfm_ablation_2",
+        "run_dir": "/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/06_2_gru_current",
+        "command": [
+          "/home/jack/miniforge3/envs/flower/bin/python",
+          "/home/jack/Skilled_FLOWER/logs/skill_ablation_queue/sfm_skills_20261031_13_123_12_3_23_2/source/flower/training_calvin.py",
+          "--config-name",
+          "config_sfm_ablation_2",
+          "batch_size=64",
+          "devices=2",
+          "+trainer.max_steps=60",
+          "callbacks.status.every_n_steps=20",
+          "callbacks.checkpoint.every_n_epochs=100000",
+          "callbacks.checkpoint.save_last=false",
+          "hydra.run.dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/06_2_gru_current",
+          "logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/06_2_gru_current",
+          "checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031",
+          "callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/06_2_gru_current/checkpoints"
+        ]
+      }
+    ]
+  },
+  "state": "passed",
+  "started_at": "2026-10-30T21:34:00.930180+00:00",
+  "results": [
+    {
+      "name": "01_13_faflow_history",
+      "config": "config_sfm_ablation_13",
+      "state": "passed",
+      "started_at": "2026-10-30T21:34:01.337870+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 89863,
+        "3": 89863
+      },
+      "pid": 3338931,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:35:33.326964+00:00",
+        "epoch": 2,
+        "global_step": 60,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 0.36347275972366333,
+        "learning_rates": [
+          2.6803331197950035e-06,
+          2.6803331197950035e-06
+        ],
+        "amp_scale": 65536.0,
+        "gru_weight_version_change": 120,
+        "elapsed_seconds": 69.45438222028315,
+        "gpu_allocated_gib": 18.798410892486572,
+        "gpu_peak_allocated_gib": 86.62536764144897
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 106.08731146063656,
+      "ended_at": "2026-10-30T21:35:47.425628+00:00",
+      "timing": {
+        "warmup_steps": 20,
+        "measured_steps": 40,
+        "measured_seconds": 42.76026252750307,
+        "seconds_per_step": 1.069006563187577,
+        "global_samples_per_second": 119.73733783104944,
+        "steps_per_epoch": 1041,
+        "epochs": 30,
+        "estimated_epoch_seconds": 1112.8358322782676,
+        "estimated_30_epoch_seconds": 33385.07496834803,
+        "startup_seconds": 22.534784,
+        "shutdown_seconds": 14.098664,
+        "warmup_seconds": 26.69040864519775,
+        "gru_weight_version_change": 80,
+        "amp_scale": 65536.0,
+        "amp_skipped_updates_in_measurement": false,
+        "intervals": [
+          {
+            "start_step": 20,
+            "end_step": 40,
+            "seconds_per_step": 1.0714557481463998
+          },
+          {
+            "start_step": 40,
+            "end_step": 60,
+            "seconds_per_step": 1.0665573782287538
+          }
+        ],
+        "excludes": [
+          "checkpoint serialization",
+          "epoch-boundary overhead"
+        ],
+        "includes": [
+          "data loading",
+          "augmentation",
+          "forward/backward",
+          "DDP",
+          "AdamW",
+          "EMA",
+          "Lightning",
+          "production logging frequency"
+        ]
+      },
+      "checkpoints_saved": false
+    },
+    {
+      "name": "02_123_faflow_current_history",
+      "config": "config_sfm_ablation_123",
+      "state": "passed",
+      "started_at": "2026-10-30T21:35:47.962026+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 91133,
+        "3": 91133
+      },
+      "pid": 3342171,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:37:27.378197+00:00",
+        "epoch": 2,
+        "global_step": 60,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 0.4130215346813202,
+        "learning_rates": [
+          2.6803331197950035e-06,
+          2.6803331197950035e-06
+        ],
+        "amp_scale": 8192.0,
+        "gru_weight_version_change": 114,
+        "elapsed_seconds": 74.06133159436285,
+        "gpu_allocated_gib": 20.02875328063965,
+        "gpu_peak_allocated_gib": 87.87391424179077
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 111.99854973144829,
+      "ended_at": "2026-10-30T21:37:39.961226+00:00",
+      "timing": {
+        "warmup_steps": 20,
+        "measured_steps": 40,
+        "measured_seconds": 45.649604643695056,
+        "seconds_per_step": 1.1412401160923764,
+        "global_samples_per_second": 112.15869315764499,
+        "steps_per_epoch": 1041,
+        "epochs": 30,
+        "estimated_epoch_seconds": 1188.0309608521638,
+        "estimated_30_epoch_seconds": 35640.928825564915,
+        "startup_seconds": 25.354918,
+        "shutdown_seconds": 12.583029,
+        "warmup_seconds": 28.40762118436396,
+        "gru_weight_version_change": 80,
+        "amp_scale": 8192.0,
+        "amp_skipped_updates_in_measurement": false,
+        "intervals": [
+          {
+            "start_step": 20,
+            "end_step": 40,
+            "seconds_per_step": 1.1463932918850332
+          },
+          {
+            "start_step": 40,
+            "end_step": 60,
+            "seconds_per_step": 1.1360869402997196
+          }
+        ],
+        "excludes": [
+          "checkpoint serialization",
+          "epoch-boundary overhead"
+        ],
+        "includes": [
+          "data loading",
+          "augmentation",
+          "forward/backward",
+          "DDP",
+          "AdamW",
+          "EMA",
+          "Lightning",
+          "production logging frequency"
+        ]
+      },
+      "checkpoints_saved": false
+    },
+    {
+      "name": "03_12_faflow_current",
+      "config": "config_sfm_ablation_12",
+      "state": "passed",
+      "started_at": "2026-10-30T21:37:40.534774+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 10
+        }
+      ],
+      "peak_used_mib": {
+        "2": 91133,
+        "3": 91133
+      },
+      "pid": 3344399,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:39:19.545504+00:00",
+        "epoch": 2,
+        "global_step": 60,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 0.34970882534980774,
+        "learning_rates": [
+          2.6803331197950035e-06,
+          2.6803331197950035e-06
+        ],
+        "amp_scale": 16384.0,
+        "gru_weight_version_change": 116,
+        "elapsed_seconds": 73.68879754468799,
+        "gpu_allocated_gib": 20.028145790100098,
+        "gpu_peak_allocated_gib": 87.87298917770386
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 111.8936247555539,
+      "ended_at": "2026-10-30T21:39:32.429042+00:00",
+      "timing": {
+        "warmup_steps": 20,
+        "measured_steps": 40,
+        "measured_seconds": 45.59662279672921,
+        "seconds_per_step": 1.1399155699182302,
+        "global_samples_per_second": 112.28901804471523,
+        "steps_per_epoch": 1041,
+        "epochs": 30,
+        "estimated_epoch_seconds": 1186.6521082848776,
+        "estimated_30_epoch_seconds": 35599.56324854633,
+        "startup_seconds": 25.322017,
+        "shutdown_seconds": 12.883538,
+        "warmup_seconds": 28.08749417681247,
+        "gru_weight_version_change": 80,
+        "amp_scale": 16384.0,
+        "amp_skipped_updates_in_measurement": false,
+        "intervals": [
+          {
+            "start_step": 20,
+            "end_step": 40,
+            "seconds_per_step": 1.1399298674426972
+          },
+          {
+            "start_step": 40,
+            "end_step": 60,
+            "seconds_per_step": 1.1399012723937632
+          }
+        ],
+        "excludes": [
+          "checkpoint serialization",
+          "epoch-boundary overhead"
+        ],
+        "includes": [
+          "data loading",
+          "augmentation",
+          "forward/backward",
+          "DDP",
+          "AdamW",
+          "EMA",
+          "Lightning",
+          "production logging frequency"
+        ]
+      },
+      "checkpoints_saved": false
+    },
+    {
+      "name": "04_3_gru_history",
+      "config": "config_sfm_ablation_3",
+      "state": "passed",
+      "started_at": "2026-10-30T21:39:32.954670+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 89761,
+        "3": 89761
+      },
+      "pid": 3346652,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:41:05.484368+00:00",
+        "epoch": 2,
+        "global_step": 60,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 0.6722609996795654,
+        "learning_rates": [
+          2.6803331197950035e-06,
+          2.6803331197950035e-06
+        ],
+        "amp_scale": 1024.0,
+        "gru_weight_version_change": 108,
+        "elapsed_seconds": 69.51967400033027,
+        "gpu_allocated_gib": 18.702889919281006,
+        "gpu_peak_allocated_gib": 86.52241897583008
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 104.02175363525748,
+      "ended_at": "2026-10-30T21:41:16.977378+00:00",
+      "timing": {
+        "warmup_steps": 20,
+        "measured_steps": 40,
+        "measured_seconds": 43.03728971350938,
+        "seconds_per_step": 1.0759322428377345,
+        "global_samples_per_second": 118.96659929291121,
+        "steps_per_epoch": 1041,
+        "epochs": 30,
+        "estimated_epoch_seconds": 1120.0454647940817,
+        "estimated_30_epoch_seconds": 33601.36394382245,
+        "startup_seconds": 23.010121,
+        "shutdown_seconds": 11.49301,
+        "warmup_seconds": 26.478317683562636,
+        "gru_weight_version_change": 80,
+        "amp_scale": 1024.0,
+        "amp_skipped_updates_in_measurement": false,
+        "intervals": [
+          {
+            "start_step": 20,
+            "end_step": 40,
+            "seconds_per_step": 1.0792054147925227
+          },
+          {
+            "start_step": 40,
+            "end_step": 60,
+            "seconds_per_step": 1.0726590708829462
+          }
+        ],
+        "excludes": [
+          "checkpoint serialization",
+          "epoch-boundary overhead"
+        ],
+        "includes": [
+          "data loading",
+          "augmentation",
+          "forward/backward",
+          "DDP",
+          "AdamW",
+          "EMA",
+          "Lightning",
+          "production logging frequency"
+        ]
+      },
+      "checkpoints_saved": false
+    },
+    {
+      "name": "05_23_gru_current_history",
+      "config": "config_sfm_ablation_23",
+      "state": "passed",
+      "started_at": "2026-10-30T21:41:17.529623+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 91031,
+        "3": 91031
+      },
+      "pid": 3348918,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:42:55.579550+00:00",
+        "epoch": 2,
+        "global_step": 60,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 1.0025726556777954,
+        "learning_rates": [
+          2.6803331197950035e-06,
+          2.6803331197950035e-06
+        ],
+        "amp_scale": 256.0,
+        "gru_weight_version_change": 104,
+        "elapsed_seconds": 72.50379735510796,
+        "gpu_allocated_gib": 19.933232307434082,
+        "gpu_peak_allocated_gib": 87.77133178710938
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 112.42623835336417,
+      "ended_at": "2026-10-30T21:43:09.956643+00:00",
+      "timing": {
+        "warmup_steps": 20,
+        "measured_steps": 40,
+        "measured_seconds": 44.82553506270051,
+        "seconds_per_step": 1.1206383765675128,
+        "global_samples_per_second": 114.22061092719383,
+        "steps_per_epoch": 1041,
+        "epochs": 30,
+        "estimated_epoch_seconds": 1166.5845500067808,
+        "estimated_30_epoch_seconds": 34997.53650020342,
+        "startup_seconds": 25.546217,
+        "shutdown_seconds": 14.377093,
+        "warmup_seconds": 27.674532312899828,
+        "gru_weight_version_change": 80,
+        "amp_scale": 256.0,
+        "amp_skipped_updates_in_measurement": false,
+        "intervals": [
+          {
+            "start_step": 20,
+            "end_step": 40,
+            "seconds_per_step": 1.1135936882346869
+          },
+          {
+            "start_step": 40,
+            "end_step": 60,
+            "seconds_per_step": 1.1276830649003386
+          }
+        ],
+        "excludes": [
+          "checkpoint serialization",
+          "epoch-boundary overhead"
+        ],
+        "includes": [
+          "data loading",
+          "augmentation",
+          "forward/backward",
+          "DDP",
+          "AdamW",
+          "EMA",
+          "Lightning",
+          "production logging frequency"
+        ]
+      },
+      "checkpoints_saved": false
+    },
+    {
+      "name": "06_2_gru_current",
+      "config": "config_sfm_ablation_2",
+      "state": "passed",
+      "started_at": "2026-10-30T21:43:10.534615+00:00",
+      "gpu_baseline": [
+        {
+          "index": 2,
+          "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        },
+        {
+          "index": 3,
+          "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+          "used_mib": 17,
+          "total_mib": 97887,
+          "utilization": 0
+        }
+      ],
+      "peak_used_mib": {
+        "2": 91029,
+        "3": 91029
+      },
+      "pid": 3351065,
+      "progress": {
+        "state": "completed",
+        "updated_at": "2026-10-30T21:44:49.014644+00:00",
+        "epoch": 2,
+        "global_step": 60,
+        "steps_per_epoch": 1041,
+        "max_epochs": 30,
+        "loss": 0.5906639099121094,
+        "learning_rates": [
+          2.6803331197950035e-06,
+          2.6803331197950035e-06
+        ],
+        "amp_scale": 1024.0,
+        "gru_weight_version_change": 108,
+        "elapsed_seconds": 72.590107800439,
+        "gpu_allocated_gib": 19.93262481689453,
+        "gpu_peak_allocated_gib": 87.77004051208496
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 112.33859230857342,
+      "ended_at": "2026-10-30T21:45:02.874075+00:00",
+      "timing": {
+        "warmup_steps": 20,
+        "measured_steps": 40,
+        "measured_seconds": 45.005931762978435,
+        "seconds_per_step": 1.1251482940744608,
+        "global_samples_per_second": 113.76278191426483,
+        "steps_per_epoch": 1041,
+        "epochs": 30,
+        "estimated_epoch_seconds": 1171.2793741315138,
+        "estimated_30_epoch_seconds": 35138.38122394541,
+        "startup_seconds": 25.889992,
+        "shutdown_seconds": 13.859431,
+        "warmup_seconds": 27.580231479369104,
+        "gru_weight_version_change": 80,
+        "amp_scale": 1024.0,
+        "amp_skipped_updates_in_measurement": false,
+        "intervals": [
+          {
+            "start_step": 20,
+            "end_step": 40,
+            "seconds_per_step": 1.1187974920030683
+          },
+          {
+            "start_step": 40,
+            "end_step": 60,
+            "seconds_per_step": 1.1314990961458533
+          }
+        ],
+        "excludes": [
+          "checkpoint serialization",
+          "epoch-boundary overhead"
+        ],
+        "includes": [
+          "data loading",
+          "augmentation",
+          "forward/backward",
+          "DDP",
+          "AdamW",
+          "EMA",
+          "Lightning",
+          "production logging frequency"
+        ]
+      },
+      "checkpoints_saved": false
+    }
+  ],
+  "ended_at": "2026-10-30T21:45:03.126012+00:00",
+  "final_gpu_state": [
+    {
+      "index": 2,
+      "uuid": "GPU-d35e22aa-7657-693d-c2a1-ee328451ebd5",
+      "used_mib": 17,
+      "total_mib": 97887,
+      "utilization": 0
+    },
+    {
+      "index": 3,
+      "uuid": "GPU-2c861927-e5d9-12f4-b5ba-df4bab6644c8",
+      "used_mib": 17,
+      "total_mib": 97887,
+      "utilization": 0
+    }
+  ]
+}

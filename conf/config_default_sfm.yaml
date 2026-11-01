@@ -6,6 +6,7 @@ defaults:
 root_data_dir: /home/jack/Skilled_FLOWER/datasets/default_sfm_crop_v2
 lang_folder: lang_annotations
 log_dir: /home/jack/Skilled_FLOWER/logs/default_sfm
+checkpoint_root: /data/jack/Skilled_FLOWER/checkpoints
 seed: 42
 devices: 2
 # Per-GPU batch; global batch is 128 with GPUs 0 and 1.
@@ -39,6 +40,9 @@ trainer:
 
 callbacks:
   checkpoint:
+    # Resolved from checkpoint_root, log variant, actual run directory and seed.
+    # An explicit callbacks.checkpoint.dirpath remains available as an override.
+    dirpath: null
     every_n_epochs: 5
     save_on_train_epoch_end: true
     save_top_k: -1

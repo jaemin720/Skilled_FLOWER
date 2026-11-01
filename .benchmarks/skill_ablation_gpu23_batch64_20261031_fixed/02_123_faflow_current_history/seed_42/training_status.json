@@ -1,0 +1,18 @@
+{
+  "state": "completed",
+  "updated_at": "2026-10-30T21:14:20.731509+00:00",
+  "epoch": 2,
+  "global_step": 10,
+  "steps_per_epoch": 1041,
+  "max_epochs": 30,
+  "loss": 1.2306631803512573,
+  "learning_rates": [
+    2.103779628443306e-06,
+    2.103779628443306e-06
+  ],
+  "amp_scale": 16384.0,
+  "gru_weight_version_change": 16,
+  "elapsed_seconds": 16.844007648527622,
+  "gpu_allocated_gib": 20.02875280380249,
+  "gpu_peak_allocated_gib": 87.87391376495361
+}

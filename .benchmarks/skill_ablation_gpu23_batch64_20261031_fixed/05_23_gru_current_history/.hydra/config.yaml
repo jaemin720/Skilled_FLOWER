@@ -1,0 +1,261 @@
+root_data_dir: /home/jack/Skilled_FLOWER/datasets/default_sfm_crop_v2
+lang_folder: lang_annotations
+log_dir: /home/jack/Skilled_FLOWER/logs/skill_ablation_queue
+slurm: false
+seed: 42
+device: cuda
+batch_size: 64
+devices: 2
+act_dim: 7
+proprio_dims: 11
+obs_dim: 512
+goal_dim: 512
+obs_seq_len: 1
+act_seq_len: 10
+multistep: 5
+p_last_state: 0
+gen_img_res: 112
+max_epochs: 30
+num_workers: 4
+benchmark_name: default_sfm
+use_extracted_rel_actions: true
+trainer:
+  devices: ${devices}
+  precision: 16-mixed
+  max_epochs: ${max_epochs}
+  sync_batchnorm: false
+  accelerator: gpu
+  strategy: ddp
+  limit_train_batches: 1.0
+  limit_val_batches: 0
+  num_sanity_val_steps: 0
+  log_every_n_steps: 20
+  enable_progress_bar: false
+  max_steps: 10
+logger:
+  _target_: pytorch_lightning.loggers.WandbLogger
+  save_dir: /home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/05_23_gru_current_history
+  name: gru_current_history_skill
+  group: default_sfm_unnormalized_state
+  project: flower_sfm_skill_ablation
+  entity: hjm20720-d
+  id: ???
+  offline: true
+model:
+  load_pretrained: true
+  pretrained_model_path: /home/jack/Skilled_FLOWER/flower_vla_pret/360000_model_weights.pt
+  lowdim_obs_dim: ${proprio_dims}
+  _target_: flower.models.flower.FLOWERVLA
+  _recursive_: false
+  vlm_path: /home/jack/.cache/huggingface/hub/models--microsoft--Florence-2-large/snapshots/21a599d414c4d928c9032694c424fb94458e3594
+  freeze_florence: false
+  freeze_vision_tower: false
+  vlm_prompt_style: default
+  token_dropout: 0.1
+  multistep: ${multistep}
+  num_sampling_steps: 4
+  action_dim: 7
+  act_window_size: ${act_seq_len}
+  use_second_view: true
+  second_view_key: image_wrist
+  action_type_adaln: true
+  use_causal_attention: true
+  use_cross_attn: true
+  use_adaln_cond: false
+  use_readout_token: false
+  use_proprio: true
+  return_act_chunk: false
+  use_force_history_adaln: true
+  force_history_encoder_type: gru
+  force_history_dim: 6
+  force_history_hidden_dim: 128
+  force_history_gru_layers: 1
+  force_history_dropout: 0.0
+  force_history_length: 50
+  force_history_latent_dim: 128
+  adaln_conditioning_type: sum
+  adaln_conditioning_hidden_dim: null
+  skill_source: both
+  quest_project_root: ${quest_project_root}
+  quest_checkpoint_path: ${quest_project_root}/artifacts/research/flower_stage2_20261030/stageII/final.pt
+  quest_clip_snapshot: ${quest_clip_snapshot}
+  skill_cond_pool: mean
+  sampling_type: uniform
+  dit_dim: 1024
+  n_heads: 16
+  n_layers: 12
+  attn_pdrop: 0.1
+  resid_pdrop: 0.1
+  mlp_pdrop: 0.1
+  bbox_loss: false
+  bbox_loss_weight: 0.05
+  bbox_key: bbox
+  use_rope: true
+  use_nope: false
+  query_seq_len: 100
+  rope_theta: 32.0
+  optimizer_type: adamw
+  optimizer:
+    _target_: torch.optim.AdamW
+    transformer_weight_decay: 0.05
+    learning_rate: 2.0e-05
+    betas:
+    - 0.9
+    - 0.95
+  lr_scheduler:
+    lr_scheduler:
+      init_lr: 2.0e-05
+      init_lr_scale: 0.1
+      final_lr_scale: 0.5
+      total_steps: 31230
+      phase_ratio: (0.05, 0.1, 0.85)
+      lr: 2.0e-05
+callbacks:
+  ema:
+    _target_: flower.callbacks.ema.EMA
+    decay: 0.999
+    start_step: 0
+    save_ema_weights_in_callback_state: true
+    evaluate_ema_weights_instead: true
+    power: 0.6666666666666666
+    inv_gamma: 1.0
+    min_value: 0.0
+    max_value: 0.9999
+  checkpoint:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    save_top_k: -1
+    save_last: false
+    verbose: true
+    monitor: null
+    mode: min
+    dirpath: /home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed/05_23_gru_current_history/checkpoints
+    filename: epoch{epoch:03d}
+    every_n_epochs: 100000
+    save_on_train_epoch_end: true
+    auto_insert_metric_name: false
+  status:
+    _target_: flower.callbacks.training_status.TrainingStatus
+    every_n_steps: 1
+datamodule:
+  transforms:
+    train:
+      rgb_static:
+      - _target_: flower.utils.transforms.ScaleImageTensor
+      - _target_: torchvision.transforms.Normalize
+        mean:
+        - 0.48145466
+        - 0.4578275
+        - 0.40821073
+        std:
+        - 0.26862954
+        - 0.26130258
+        - 0.27577711
+      rgb_gripper:
+      - _target_: flower.utils.transforms.ScaleImageTensor
+      - _target_: torchvision.transforms.Normalize
+        mean:
+        - 0.48145466
+        - 0.4578275
+        - 0.40821073
+        std:
+        - 0.26862954
+        - 0.26130258
+        - 0.27577711
+    val:
+      rgb_static:
+      - _target_: flower.utils.transforms.ScaleImageTensor
+      - _target_: torchvision.transforms.Normalize
+        mean:
+        - 0.48145466
+        - 0.4578275
+        - 0.40821073
+        std:
+        - 0.26862954
+        - 0.26130258
+        - 0.27577711
+      rgb_gripper:
+      - _target_: flower.utils.transforms.ScaleImageTensor
+      - _target_: torchvision.transforms.Normalize
+        mean:
+        - 0.48145466
+        - 0.4578275
+        - 0.40821073
+        std:
+        - 0.26862954
+        - 0.26130258
+        - 0.27577711
+  _target_: flower.datasets.hulc_data_module.HulcDataModule
+  _recursive_: false
+  root_data_dir: ${root_data_dir}
+  use_validation: false
+  action_space: 7
+  action_max:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  action_min:
+  - -1.0
+  - -1.0
+  - -1.0
+  - -1.0
+  - -1.0
+  - -1.0
+  - -1.0
+  shuffle_val: false
+  observation_space:
+    rgb_obs:
+    - rgb_static
+    - rgb_gripper
+    depth_obs: []
+    state_obs:
+    - robot_obs
+    actions:
+    - rel_actions
+    language:
+    - language
+  proprioception_dims:
+    n_state_obs: ${proprio_dims}
+    keep_indices:
+    - - 0
+      - 1
+    - - 3
+      - 13
+    normalize: false
+    normalize_robot_orientation: false
+  datasets:
+    lang_dataset:
+      _target_: flower.datasets.sfm_dataset.SfmDiskDataset
+      key: lang
+      save_format: npz
+      batch_size: ${batch_size}
+      min_window_size: ${act_seq_len}
+      max_window_size: ${act_seq_len}
+      proprio_state: ${datamodule.proprioception_dims}
+      obs_space: ${datamodule.observation_space}
+      skip_frames: 1
+      pad: false
+      lang_folder: ${lang_folder}
+      aux_lang_loss_window: 8
+      num_workers: ${num_workers}
+      action_seq_len: ${act_seq_len}
+      obs_seq_len: ${obs_seq_len}
+      future_range: 1
+      use_extracted_rel_actions: true
+      extracted_dir: ${root_data_dir}/training/extracted
+      load_force_history: true
+      force_history_key: right_force_history
+      load_bbox: false
+      shared_color_jitter: true
+      proprio_source: physical
+      load_skill_history: true
+      load_quest_observations: true
+checkpoint_root: /home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_batch64_20261031_fixed
+experiment_components:
+- 2
+- 3
+quest_project_root: ${oc.env:QUEST_SFM_ROOT,/home/jack/Quest_SFM/flower_id2430_code}
+quest_clip_snapshot: ${oc.env:QUEST_CLIP_SNAPSHOT,/home/jack/Quest_SFM/clip-vit-base-patch32}

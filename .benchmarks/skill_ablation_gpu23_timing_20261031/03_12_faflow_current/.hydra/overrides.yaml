@@ -1,0 +1,9 @@
+- batch_size=64
+- devices=2
+- +trainer.max_steps=60
+- callbacks.status.every_n_steps=20
+- callbacks.checkpoint.every_n_epochs=100000
+- callbacks.checkpoint.save_last=false
+- logger.save_dir=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/03_12_faflow_current
+- checkpoint_root=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031
+- callbacks.checkpoint.dirpath=/home/jack/Skilled_FLOWER/.benchmarks/skill_ablation_gpu23_timing_20261031/03_12_faflow_current/checkpoints
